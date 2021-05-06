@@ -203,6 +203,32 @@ class baseline_Bert(nn.Module):
         logits = self.fc(pooled)
         return logits
 
+    def predict_prob(self, X: torch.Tensor, y_true: torch.Tensor)->[float]:
+        if X.dim() == 1:
+            X = X.view(1, -1)
+        if y_true.dim() == 0:
+            y_true = y_true.view(1)
+
+        with torch.no_grad():
+            encoder, pooled = self.bert_model(X)[:]
+            logits = self.fc(pooled)
+            logits = F.softmax(logits, dim=1)
+            prob = [logits[i][y_true[i]].item() for i in range(y_true.size(0))]
+            return prob
+
+    def predict_class(self, X:torch.Tensor)->[int]:
+        if X.dim() == 1:
+            X = X.view(1, -1)
+        predicts = None
+        with torch.no_grad():
+            encoder, pooled = self.bert_model(X)[:]
+            logits = self.fc(pooled)
+            logits = F.softmax(logits, dim=1)
+            predicts = [one.argmax(0).item() for one in logits]
+        return predicts
+
+
+
 class baseline_TextCNN_encoder(nn.Module):
     def __init__(self, word_dim, num_channels:list, kernel_sizes:list, is_batch_normal:bool):
         super(baseline_TextCNN_encoder, self).__init__()
