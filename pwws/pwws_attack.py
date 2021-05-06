@@ -13,6 +13,7 @@ from torch import nn
 from baseline_model_builder import BaselineModelBuilder
 import torch
 import time
+from transformers import BertTokenizer
 '''
     ATTENTION:
     Below three functions (PWWS, evaluate_word_saliency, adversarial_paraphrase)
@@ -312,6 +313,7 @@ def adversarial_paraphrase(input_text,
                            origin_vector,
                            true_y,
                            net: nn.Module,
+                           tokenizer,
                            verbose=False,
                            sub_rate_limit=None):
     '''
@@ -329,7 +331,8 @@ def adversarial_paraphrase(input_text,
         Halt if model output is changed.
         '''
         maxlen = config_data[config_dataset].padding_maxlen
-        perturbed_vector = str2seq(perturbed_text, maxlen).to(config_device)
+        perturbed_vector = str2seq(perturbed_text, maxlen,
+                                   tokenizer).to(config_device)
         predict = net.predict_class(perturbed_vector)[0]
         return predict != true_y
 
@@ -342,7 +345,8 @@ def adversarial_paraphrase(input_text,
         maxlen = config_data[config_dataset].padding_maxlen
         perturbed_tokens = _compile_perturbed_tokens(doc, [candidate])
         perturbed_doc = ' '.join(perturbed_tokens)
-        perturbed_vector = str2seq(perturbed_doc, maxlen).to(config_device)
+        perturbed_vector = str2seq(perturbed_doc, maxlen,
+                                   tokenizer).to(config_device)
         adv_y = net.predict_prob(perturbed_vector, true_y)[0]
         ori_y = net.predict_prob(origin_vector, true_y)[0]
 
@@ -365,7 +369,8 @@ def adversarial_paraphrase(input_text,
     # print("perturbed_text after perturb_text:", perturbed_text)
 
     maxlen = config_data[config_dataset].padding_maxlen
-    perturbed_vector = str2seq(perturbed_text, maxlen).to(config_device)
+    perturbed_vector = str2seq(perturbed_text, maxlen,
+                               tokenizer).to(config_device)
     perturbed_y = net.predict_class(perturbed_vector)[0]
     if verbose:
         origin_prob = net.predict_prob(origin_vector, true_y)[0]
@@ -376,12 +381,12 @@ def adversarial_paraphrase(input_text,
     return perturbed_text, perturbed_y, sub_rate, NE_rate, change_tuple_list
 
 
-def get_fool_sentence_pwws(sentence: str, label: int, index: int, net, verbose,
-                           sub_rate_limit):
+def get_fool_sentence_pwws(sentence: str, label: int, index: int, net,
+                           tokenizer, verbose, sub_rate_limit):
 
     start = time.perf_counter()
     maxlen = config_data[config_dataset].padding_maxlen
-    vector = str2seq(sentence, maxlen).to(config_device)
+    vector = str2seq(sentence, maxlen, tokenizer).to(config_device)
     label = torch.tensor(label).to(config_device)
     flag = -1
     predict = net.predict_class(vector)[0]
@@ -392,6 +397,7 @@ def get_fool_sentence_pwws(sentence: str, label: int, index: int, net, verbose,
             vector,
             label,
             net,
+            tokenizer,
             verbose,
             sub_rate_limit,
         )
@@ -404,7 +410,7 @@ def get_fool_sentence_pwws(sentence: str, label: int, index: int, net, verbose,
 
 
 if __name__ == '__main__':
-    tokenizer = Tokenizer()
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     datas, labels = read_IMDB_text_data()
     baseline_model_builder = BaselineModelBuilder('IMDB',
                                                   'Bert',
@@ -417,7 +423,7 @@ if __name__ == '__main__':
     attack_time = 0
     for idx, data in enumerate(datas):
         adv_s, flag, end = get_fool_sentence_pwws(data, labels[idx], idx, net,
-                                                  False, None)
+                                                  tokenizer, False, None)
         attack_time += end
         if flag == 1:
             success_num += 1

@@ -39,7 +39,7 @@ def parse_bool(x):
 def read_IMDB_text_data():
     datas = []
     labels = []
-    i = 20
+    i = 200
     with open('./dataset/IMDB/aclImdb/test.std', 'r',
               encoding='utf-8') as file:
         for line in file:
@@ -133,24 +133,22 @@ def write_standard_data(datas, labels, path, mod='w'):
             file.write(datas[i] + str(labels[i]) + '\n')
 
 
-def str2tokens(sentence: str) -> [str]:
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+def str2tokens(sentence: str, tokenizer) -> [str]:
     return tokenizer.tokenize(sentence)
 
 
-def tokens2seq(tokens: [str], maxlen: int) -> torch.Tensor:
+def tokens2seq(tokens: [str], maxlen: int, tokenizer) -> torch.Tensor:
     pad_word = 0
     x = [pad_word for _ in range(maxlen)]
     temp = tokens[:maxlen]
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     for idx, word in enumerate(temp):
         x[idx] = tokenizer.convert_tokens_to_ids(word)
     return torch.tensor(x)
 
 
-def str2seq(sentence: str, maxlen: int) -> torch.Tensor:
-    tokens = str2tokens(sentence)
-    return tokens2seq(tokens, maxlen)
+def str2seq(sentence: str, maxlen: int, tokenizer) -> torch.Tensor:
+    tokens = str2tokens(sentence, tokenizer)
+    return tokens2seq(tokens, maxlen, tokenizer)
 
 
 def read_fool_log(path):
