@@ -1,7 +1,7 @@
 import torch
 from baseline_config import 
 
-class baseline_Bert(nn.Module):
+class Baseline_Bert(nn.Module):
     def __init__(self,
                  label_num: int,
                  linear_layer_num: int,

@@ -7,7 +7,7 @@ nlp = spacy.load('en_core_web_sm')
 
 
 class IMDB_Dataset(Dataset):
-    def __init__(self, train_data=True, debug_mode=False):
+    def __init__(self, train_data=True, if_mask_NE=False, debug_mode=False):
         super(IMDB_Dataset, self).__init__()
         if train_data:
             self.path = IMDBConfig.train_data_path
@@ -19,7 +19,7 @@ class IMDB_Dataset(Dataset):
         self.sen_len = IMDBConfig.sen_len
         self.data_tokens = []
         self.data_idx = []
-        self.data2tokens()
+        self.data2tokens(if_mask_NE)
         self.token2idx()
         self.transfor()
 
@@ -46,7 +46,7 @@ class IMDB_Dataset(Dataset):
         logging(f'loading data {len(data)} from {path}')
         return data, labels
 
-    def data2tokens(self, if_mask_NE=False):
+    def data2tokens(self, if_mask_NE):
         logging(f'{self.path} in data2tokens')
         if if_mask_NE:
             for sen in self.datas:
