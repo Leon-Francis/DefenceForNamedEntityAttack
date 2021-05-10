@@ -8,7 +8,6 @@ from baseline_config import Baseline_Config, config_path, dataset_config
 from datetime import datetime
 import os
 from shutil import copyfile
-from tqdm import tqdm
 import copy
 
 
@@ -36,19 +35,16 @@ def build_dataset():
 
 def train(train_data, baseline_model, criterion, optimizer):
     loss_mean = 0.0
-    with tqdm(total=len(train_data), desc='train') as pbar:
-        for x, y in train_data:
-            x, y = x.to(Baseline_Config.train_device), y.to(
-                Baseline_Config.train_device)
-            logits = baseline_model(x)
-            loss = criterion(logits, y)
-            loss_mean += loss.item()
-            if loss.item() > Baseline_Config.skip_loss:
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-            pbar.set_postfix_str(f'loss {loss.item():.5f}')
-            pbar.update(1)
+    for x, y in train_data:
+        x, y = x.to(Baseline_Config.train_device), y.to(
+            Baseline_Config.train_device)
+        logits = baseline_model(x)
+        loss = criterion(logits, y)
+        loss_mean += loss.item()
+        if loss.item() > Baseline_Config.skip_loss:
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
     return loss_mean / len(train_data)
 
@@ -58,21 +54,16 @@ def evaluate(test_data, baseline_model, criterion):
     loss_mean = 0.0
     correct = 0
     total = 0
-    with tqdm(total=len(test_data), desc='evaluate') as pbar:
-        for x, y in test_data:
-            x, y = x.to(Baseline_Config.train_device), y.to(
-                Baseline_Config.train_device)
-            logits = baseline_model(x)
-            loss = criterion(logits, y)
-            loss_mean += loss.item()
+    for x, y in test_data:
+        x, y = x.to(Baseline_Config.train_device), y.to(
+            Baseline_Config.train_device)
+        logits = baseline_model(x)
+        loss = criterion(logits, y)
+        loss_mean += loss.item()
 
-            predicts = logits.argmax(dim=-1)
-            correct += predicts.eq(y).float().sum().item()
-            total += y.size()[0]
-
-            pbar.set_postfix_str(
-                f'loss {loss.item():.5f} acc {correct/total:.5f}')
-            pbar.update(1)
+        predicts = logits.argmax(dim=-1)
+        correct += predicts.eq(y).float().sum().item()
+        total += y.size()[0]
 
     return loss_mean / len(test_data), correct / total
 
