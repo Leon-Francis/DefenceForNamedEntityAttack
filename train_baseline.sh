@@ -1,0 +1,1 @@
+nohup python ./baseline/baseline_train.py > ./baseline/logs/train_baseline_IMDB_Bert_0.log 2>&1 &

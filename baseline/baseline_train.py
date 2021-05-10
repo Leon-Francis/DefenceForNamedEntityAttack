@@ -3,12 +3,13 @@ import torch
 from torch.utils.data import DataLoader
 from torch import nn, optim
 from baseline_model import Baseline_Bert
-from baseline_tools import logging
+from baseline_tools import logging, get_time
 from baseline_config import Baseline_Config, config_path, dataset_config
 from datetime import datetime
 import os
 from shutil import copyfile
 from tqdm import tqdm
+import copy
 
 
 def save_config(path):
@@ -30,6 +31,7 @@ def build_dataset():
                            batch_size=Baseline_Config.batch_size,
                            shuffle=False,
                            num_workers=4)
+    return train_data, test_data
 
 
 def train(train_data, baseline_model, criterion, optimizer):
@@ -72,46 +74,7 @@ def evaluate(test_data, baseline_model, criterion):
                 f'loss {loss.item():.5f} acc {correct/total:.5f}')
             pbar.update(1)
 
-    return loss_mean / len(test_dataset), correct / total
-
-
-def main():
-    best_path = baseline_config_model_load_path[dataset_name].get(model_name)
-    best_state = None
-    best_acc = 0.0 if is_load_model == False else float(
-        re.findall("_\d.\d+_", best_path)[0][1:-1])
-    save_acc_limit = args.save_acc_limit
-    epoch = args.epoch
-
-    for ep in range(epoch):
-        logging(f'epoch {ep} start train')
-        train_loss = train()
-        logging(f'epoch {ep} start evaluate')
-        evaluate_loss, acc = evaluate()
-        if acc > best_acc:
-            best_acc = acc
-            best_path = baseline_config_model_save_path_format.format(
-                dataset_name, model_name, acc, get_time(), note)
-            best_state = copy.deepcopy(model.net.state_dict())
-
-        if epoch > 3 and (ep + 1) % (
-                epoch //
-                3) == 0 and best_acc > save_acc_limit and best_state != None:
-            logging(f'saving best model acc {best_acc:.5f} in {best_path}')
-            torch.save(best_state, best_path)
-            best_state = None
-
-        warmup_scheduler.step(ep + 1)
-        scheduler.step(evaluate_loss, ep + 1)
-
-        logging(
-            f'epoch {ep} done! train_loss {train_loss:.5f} evaluate_loss {evaluate_loss:.5f} \n'
-            f'acc {acc:.5f} now best_acc {best_acc:.5f}')
-
-    if best_acc > save_acc_limit and best_state != None:
-        logging(f'saving best model acc {best_acc:.5f} in {best_path}')
-        torch.save(best_state, best_path)
-        best_state = None
+    return loss_mean / len(test_data), correct / total
 
 
 if __name__ == '__main__':
@@ -121,9 +84,9 @@ if __name__ == '__main__':
     cur_models_dir = cur_dir + '/models'
     if not os.path.isdir(cur_dir):
         os.makedirs(cur_dir)
-        os.makedirs(cur_dir_models)
+        os.makedirs(cur_models_dir)
 
-    logging('Saving into directory' + cur_dir)
+    logging('Saving into directory ' + cur_dir)
     save_config(cur_dir)
 
     logging('preparing data...')
@@ -159,3 +122,26 @@ if __name__ == '__main__':
                                                    if ep < 4 else 1.0)
 
     criterion = nn.CrossEntropyLoss().to(Baseline_Config.train_device)
+
+    logging('Start training...')
+    best_acc = 0.0
+    for ep in range(Baseline_Config.epoch):
+        logging(f'epoch {ep} start train')
+        train_loss = train(train_data, baseline_model, criterion, optimizer)
+        logging(f'epoch {ep} start evaluate')
+        evaluate_loss, acc = evaluate(test_data, baseline_model, criterion)
+        if acc > best_acc:
+            best_acc = acc
+            best_path = cur_models_dir + f'/{Baseline_Config.dataset}_{Baseline_Config.baseline}_{acc:.5f}_{get_time()}.pt'
+            best_state = copy.deepcopy(baseline_model.state_dict())
+
+        warmup_scheduler.step(ep + 1)
+        scheduler.step(evaluate_loss, ep + 1)
+
+        logging(
+            f'epoch {ep} done! train_loss {train_loss:.5f} evaluate_loss {evaluate_loss:.5f} \n'
+            f'acc {acc:.5f} now best_acc {best_acc:.5f}')
+
+    if best_acc > Baseline_Config.save_acc_limit and best_state != None:
+        logging(f'saving best model acc {best_acc:.5f} in {best_path}')
+        torch.save(best_state, best_path)

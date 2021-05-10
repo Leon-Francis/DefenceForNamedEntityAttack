@@ -1,5 +1,7 @@
 import torch
-from baseline_config import 
+from baseline_config import Baseline_Config
+import torch.nn as nn
+from transformers import BertModel
 
 class Baseline_Bert(nn.Module):
     def __init__(self,
@@ -7,7 +9,7 @@ class Baseline_Bert(nn.Module):
                  linear_layer_num: int,
                  dropout_rate: float,
                  is_fine_tuning=True):
-        super(baseline_Bert, self).__init__()
+        super(Baseline_Bert, self).__init__()
         self.bert_model = BertModel.from_pretrained('bert-base-uncased')
         self.hidden_size = 768
         if not is_fine_tuning:

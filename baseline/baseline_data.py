@@ -1,7 +1,8 @@
 from transformers import BertTokenizer
 import spacy
+import torch
 from torch.utils.data import Dataset
-from data_tools import logging
+from baseline_tools import logging
 from baseline_config import IMDBConfig
 nlp = spacy.load('en_core_web_sm')
 
