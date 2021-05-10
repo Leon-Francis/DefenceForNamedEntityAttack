@@ -60,7 +60,7 @@ class IMDB_Dataset(Dataset):
                     for idx in range(ent.start, ent.end):
                         tokens[idx] = '[MASK]'
                 masked_NE_string = ' '.join(tokens)
-                tokens = self.tokenizer.tokenize(masked_string)[:self.sen_len]
+                tokens = self.tokenizer.tokenize(masked_NE_string)[:self.sen_len]
                 self.data_tokens.append(tokens)
         else:
             for sen in self.datas:
