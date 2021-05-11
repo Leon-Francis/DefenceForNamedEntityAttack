@@ -5,7 +5,7 @@ bert_vocab_size = 30522
 
 class Baseline_Config:
     output_dir = 'output'
-    cuda_idx = 1
+    cuda_idx = 0
     train_device = torch.device('cuda:' + str(cuda_idx))
     batch_size = 8
     dataset = 'IMDB'
@@ -15,10 +15,10 @@ class Baseline_Config:
 
     debug_mode = False
 
-    if_mask_NE = True
+    if_mask_NE = False
 
     linear_layer_num = 3
-    dropout_rate = 0.3
+    dropout_rate = 0.5
     is_fine_tuning = True
 
     Bert_lr = 1e-5
