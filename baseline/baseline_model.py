@@ -1,7 +1,8 @@
 import torch
-from baseline_config import Baseline_Config
 import torch.nn as nn
 from transformers import BertModel
+import torch.nn.functional as F
+
 
 class Baseline_Bert(nn.Module):
     def __init__(self,
@@ -33,7 +34,7 @@ class Baseline_Bert(nn.Module):
         logits = self.fc(pooled)
         return logits
 
-    def predict_prob(self, X: torch.Tensor, y_true: torch.Tensor) -> [float]:
+    def predict_prob(self, X: torch.Tensor, y_true: torch.Tensor):
         if X.dim() == 1:
             X = X.view(1, -1)
         if y_true.dim() == 0:
@@ -46,7 +47,7 @@ class Baseline_Bert(nn.Module):
             prob = [logits[i][y_true[i]].item() for i in range(y_true.size(0))]
             return prob
 
-    def predict_class(self, X: torch.Tensor) -> [int]:
+    def predict_class(self, X: torch.Tensor):
         if X.dim() == 1:
             X = X.view(1, -1)
         predicts = None

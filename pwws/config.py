@@ -1,6 +1,6 @@
 import torch
 
-config_device_name = 'cuda:0'
+config_device_name = 'cuda:1'
 config_device = torch.device(config_device_name)
 config_dataset = 'IMDB'
 
@@ -28,6 +28,7 @@ class TextCNNConfig():
         'YAHOO': 100,
     }
 
+
 class LSTMConfig():
     num_hiddens = {
         'IMDB': 100,
@@ -54,7 +55,6 @@ class LSTMConfig():
     }
 
 
-
 class IMDBConfig():
     train_data_path = r'./dataset/IMDB/train_standard.txt'
     test_data_path = r'./dataset/IMDB/test_standard.txt'
@@ -72,6 +72,7 @@ class IMDBConfig():
         'TextCNN': r'./static/IMDB/TextCNN_adv.txt',
     }
     syn_path = r'./static/IMDB/synonymous.csv'
+
 
 class AGNEWSConfig():
     train_data_path = r'./dataset/AGNEWS/train_standard.txt'
@@ -91,6 +92,7 @@ class AGNEWSConfig():
     }
     syn_path = r'./static/AGNEWS/synonymous.csv'
 
+
 class YAHOOConfig():
     train_data_path = r'./dataset/YAHOO/train150k_standard.txt'
     test_data_path = r'./dataset/YAHOO/test5k_standard.txt'
@@ -108,6 +110,7 @@ class YAHOOConfig():
         'TextCNN': r'./static/YAHOO/TextCNN_adv.txt',
     }
     syn_path = r'./static/YAHOO/synonymous.csv'
+
 
 config_data = {
     'IMDB': IMDBConfig,
@@ -143,6 +146,9 @@ config_attack_list = [
 config_pwws_use_NE = True
 config_RSE_mask_low = 2
 config_RSE_mask_rate = 0.25
+
+model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-10_21:21:39/models/IMDB_Bert_0.91088_05-10-22-57.pt',
+              'IMDB_Bert': 'output/train_baseline_model/2021-05-11_00:07:05/models/IMDB_Bert_0.91096_05-11-02-27.pt'}
 
 
 if __name__ == '__main__':

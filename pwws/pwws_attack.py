@@ -3,17 +3,17 @@ import attr
 import spacy
 from nltk.corpus import wordnet as wn
 from tools import str2seq, read_IMDB_text_data
-from preprocess import Tokenizer
 from config import config_device, config_pwws_use_NE, \
-    config_data, config_dataset
+    config_data, config_dataset, model_path
 import numpy as np
 from get_NE_list import NE_list
 from functools import partial
 from torch import nn
-from baseline_model_builder import BaselineModelBuilder
 import torch
 import time
 from transformers import BertTokenizer
+from baseline_model import Baseline_Bert
+from baseline_config import Baseline_Config, dataset_config
 '''
     ATTENTION:
     Below three functions (PWWS, evaluate_word_saliency, adversarial_paraphrase)
@@ -412,17 +412,22 @@ def get_fool_sentence_pwws(sentence: str, label: int, index: int, net,
 if __name__ == '__main__':
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     datas, labels = read_IMDB_text_data()
-    baseline_model_builder = BaselineModelBuilder('IMDB',
-                                                  'Bert',
-                                                  torch.device('cuda:0'),
-                                                  is_load=True)
-    net = baseline_model_builder.net
-    net.eval()
+    baseline_model = Baseline_Bert(
+        label_num=dataset_config[Baseline_Config.dataset].labels_num,
+        linear_layer_num=Baseline_Config.linear_layer_num,
+        dropout_rate=Baseline_Config.dropout_rate,
+        is_fine_tuning=Baseline_Config.is_fine_tuning).to(
+            config_device)
+    baseline_model.load_state_dict(
+        torch.load(model_path['IMDB_Bert_MNE'],
+                   map_location=config_device))
+
+    baseline_model.eval()
     success_num = 0
     try_all = 0
     attack_time = 0
     for idx, data in enumerate(datas):
-        adv_s, flag, end = get_fool_sentence_pwws(data, labels[idx], idx, net,
+        adv_s, flag, end = get_fool_sentence_pwws(data, labels[idx], idx, baseline_model,
                                                   tokenizer, False, None)
         attack_time += end
         if flag == 1:
