@@ -116,6 +116,7 @@ if __name__ == '__main__':
 
     logging('Start training...')
     best_acc = 0.0
+    temp_path = cur_models_dir + f'/{Baseline_Config.dataset}_{Baseline_Config.baseline}_temp_model.pt'
     for ep in range(Baseline_Config.epoch):
         logging(f'epoch {ep} start train')
         train_loss = train(train_data, baseline_model, criterion, optimizer)
@@ -125,6 +126,10 @@ if __name__ == '__main__':
             best_acc = acc
             best_path = cur_models_dir + f'/{Baseline_Config.dataset}_{Baseline_Config.baseline}_{acc:.5f}_{get_time()}.pt'
             best_state = copy.deepcopy(baseline_model.state_dict())
+
+            if epoch > 3 and best_acc > Baseline_Config.save_acc_limit and best_state != None:
+                logging(f'saving best model acc {best_acc:.5f} in {temp_path}')
+                torch.save(best_state, temp_path)
 
         warmup_scheduler.step(ep + 1)
         scheduler.step(evaluate_loss, ep + 1)
