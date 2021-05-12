@@ -147,8 +147,8 @@ config_pwws_use_NE = True
 config_RSE_mask_low = 2
 config_RSE_mask_rate = 0.25
 
-model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-10_21:21:39/models/IMDB_Bert_0.91088_05-10-22-57.pt',
-              'IMDB_Bert': 'output/train_baseline_model/2021-05-11_00:07:05/models/IMDB_Bert_0.91096_05-11-02-27.pt'}
+model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/models/IMDB_Bert_0.91328_05-12-14-47.pt',
+              'IMDB_Bert': 'output/train_baseline_model/2021-05-11_21:36:13/models/IMDB_Bert_0.91564_05-11-22-58.pt'}
 
 
 if __name__ == '__main__':
