@@ -17,7 +17,7 @@ class Baseline_Config:
 
     if_mask_NE = False
 
-    linear_layer_num = 3
+    linear_layer_num = 1
     dropout_rate = 0.5
     is_fine_tuning = True
 
