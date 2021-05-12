@@ -5,7 +5,6 @@ import torch
 import csv
 import numpy as np
 import random
-from transformers import BertTokenizer
 
 random.seed(667)
 
@@ -27,28 +26,34 @@ def get_time() -> str:
 
 def make_dir_if_not_exist(path):
     exist = os.path.exists(path)
-    if not exist: os.makedirs(path)
+    if not exist:
+        os.makedirs(path)
 
 
 def parse_bool(x):
-    if x == 'yes': return True
-    if x == 'no': return False
+    if x == 'yes':
+        return True
+    if x == 'no':
+        return False
     return None
 
 
 def read_IMDB_text_data():
     datas = []
     labels = []
-    i = 200
     with open('./dataset/IMDB/aclImdb/test.std', 'r',
               encoding='utf-8') as file:
         for line in file:
-            i -= 1
             line = line.strip('\n')
             datas.append(line[:-1])
             labels.append(int(line[-1]))
-            if i == 0:
-                break
+    randnum = random.randint(0,100)
+    random.seed(randnum)
+    random.shuffle(datas)
+    random.seed(randnum)
+    random.shuffle(labels)
+    datas = datas[:200]
+    labels = labels[:200]
     logging(f'loading data {len(datas)}')
     return datas, labels
 
@@ -91,7 +96,8 @@ def read_YAHOO_origin_data(data_path):
     dirs = os.listdir(data_path)
     for idx, dir in enumerate(dirs):
         path = os.path.join(data_path, dir)
-        if os.path.isfile(path): continue
+        if os.path.isfile(path):
+            continue
         for file in os.listdir(path):
             tpath = os.path.join(path, file)
             with open(tpath, 'r', encoding='utf-8', newline='') as t:
@@ -133,11 +139,11 @@ def write_standard_data(datas, labels, path, mod='w'):
             file.write(datas[i] + str(labels[i]) + '\n')
 
 
-def str2tokens(sentence: str, tokenizer) -> [str]:
+def str2tokens(sentence: str, tokenizer):
     return tokenizer.tokenize(sentence)
 
 
-def tokens2seq(tokens: [str], maxlen: int, tokenizer) -> torch.Tensor:
+def tokens2seq(tokens, maxlen: int, tokenizer) -> torch.Tensor:
     pad_word = 0
     x = [pad_word for _ in range(maxlen)]
     temp = tokens[:maxlen]
@@ -176,25 +182,3 @@ def get_random(s: int, e: int, weights=None):
 def np_softmax(x: list):
     x = np.exp(x)
     return x / np.sum(x, axis=0)
-
-
-if __name__ == '__main__':
-    import argparse
-    from data import MyDataset
-    from config import config_dataset_list, config_data
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', choices=config_dataset_list)
-    parser.add_argument('--num', type=int, default=None)
-    parser.add_argument('--path', default=None)
-    args = parser.parse_args()
-    dataset = args.dataset
-    num = args.num // config_data[dataset].labels_num
-    path = args.path if args.path else config_data[dataset].clean_1k_path
-
-    test_data = MyDataset(dataset,
-                          None,
-                          is_train=False,
-                          data_path=config_data[dataset].train_data_path,
-                          is_to_tokens=False)
-    datas, labels = test_data.sample_by_labels(num)
-    write_standard_data(datas, labels, path)
