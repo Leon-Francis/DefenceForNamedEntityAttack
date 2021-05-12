@@ -1,6 +1,8 @@
 import copy
 import spacy
 from collections import Counter, defaultdict
+from tqdm import tqdm
+import json
 
 labels_num = 2
 
@@ -8,13 +10,16 @@ nlp = spacy.load('en_core_web_sm')
 
 NE_type_dict = {
     'PERSON': defaultdict(int),  # People, including fictional.
-    'NORP': defaultdict(int),  # Nationalities or religious or political groups.
+    # Nationalities or religious or political groups.
+    'NORP': defaultdict(int),
     'FAC': defaultdict(int),  # Buildings, airports, highways, bridges, etc.
     'ORG': defaultdict(int),  # Companies, agencies, institutions, etc.
     'GPE': defaultdict(int),  # Countries, cities, states.
-    'LOC': defaultdict(int),  # Non-GPE locations, mountain ranges, bodies of water.
+    # Non-GPE locations, mountain ranges, bodies of water.
+    'LOC': defaultdict(int),
     'PRODUCT': defaultdict(int),  # Object, vehicles, foods, etc.(Not services)
-    'EVENT': defaultdict(int),  # Named hurricanes, battles, wars, sports events, etc.
+    # Named hurricanes, battles, wars, sports events, etc.
+    'EVENT': defaultdict(int),
     'WORK_OF_ART': defaultdict(int),  # Titles of books, songs, etc.
     'LAW': defaultdict(int),  # Named documents made into laws.
     'LANGUAGE': defaultdict(int),  # Any named language.
@@ -24,7 +29,8 @@ NE_type_dict = {
     'MONEY': defaultdict(int),  # Monetary values, including unit.
     'QUANTITY': defaultdict(int),  # Measurements, as of weight or distance.
     'ORDINAL': defaultdict(int),  # "first", "second", etc.
-    'CARDINAL': defaultdict(int),  # Numerals that do not fall under another type.
+    # Numerals that do not fall under another type.
+    'CARDINAL': defaultdict(int),
 }
 
 
@@ -40,25 +46,6 @@ def recognize_named_entity(texts):
             NE_freq_dict[word.label_][word.text] += 1
     return NE_freq_dict
 
-"""
-def find_adv_NE(D_true, D_other):
-    '''
-    find NE_adv in D-D_y_true which is defined in the end of section 3.1
-    '''
-    # adv_NE_list = []
-    for type in NE_type_dict.keys():
-        # find the most frequent true and other NEs of the same type
-        true_NE_list = [NE_tuple[0] for (i, NE_tuple) in enumerate(D_true[type]) if i < 15]
-        other_NE_list = [NE_tuple[0] for (i, NE_tuple) in enumerate(D_other[type]) if i < 30]
-
-        for other_NE in other_NE_list:
-            if other_NE not in true_NE_list and len(other_NE.split()) == 1:
-                # adv_NE_list.append((type, other_NE))
-                print("'" + type + "': '" + other_NE + "',")
-                with open('./{}.txt'.format(args.dataset), 'a', encoding='utf-8') as f:
-                    f.write("'" + type + "': '" + other_NE + "',\n")
-                break
-"""
 
 class NameEntityList(object):
     # If the original input in IMDB belongs to class 0 (negative)
@@ -359,11 +346,40 @@ class NameEntityList(object):
                'ORDINAL': 'Tertiary',
                'CARDINAL': '5'
                }
-    yahoo = [yahoo_0, yahoo_1, yahoo_2, yahoo_3, yahoo_4, yahoo_5, yahoo_6, yahoo_7, yahoo_8, yahoo_9]
+    yahoo = [yahoo_0, yahoo_1, yahoo_2, yahoo_3, yahoo_4,
+             yahoo_5, yahoo_6, yahoo_7, yahoo_8, yahoo_9]
     L = {'IMDB': imdb, 'AGNEWS': agnews, 'YAHOO': yahoo}
 
 
 NE_list = NameEntityList()
 
 if __name__ == '__main__':
-    pass
+    imdb_0 = defaultdict(list)
+    imdb_1 = defaultdict(list)
+    datas = []
+    labels = []
+    with open(r'./dataset/IMDB/aclImdb/train.std', 'r', encoding='utf-8') as file:
+        for line in file:
+            line = line.strip('\n')
+            datas.append(line[:-1])
+            labels.append(int(line[-1]))
+    for idx, sen in enumerate(tqdm(datas)):
+        doc = nlp(sen)
+        for ent in doc.ents:
+            if labels[idx] == 0:
+                if ent.lower_ not in imdb_0[ent.label_]:
+                    imdb_0[ent.label_].append(ent.lower_)
+            else:
+                if ent.lower_ not in imdb_1[ent.label_]:
+                    imdb_1[ent.label_].append(ent.lower_)
+
+    js_imdb_0 = json.dumps(imdb_0)
+    js_imdb_1 = json.dumps(imdb_1)
+
+    fileObject_0 = open('pwws/NE_dict/imdb_0.json', 'w')
+    fileObject_0.write(js_imdb_0)
+    fileObject_0.close()
+
+    fileObject_1 = open('pwws/NE_dict/imdb_1.json', 'w')
+    fileObject_1.write(js_imdb_1)
+    fileObject_1.close()
