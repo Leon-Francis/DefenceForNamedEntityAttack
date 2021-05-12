@@ -1,6 +1,6 @@
 import torch
 
-config_device_name = 'cuda:1'
+config_device_name = 'cuda:0'
 config_device = torch.device(config_device_name)
 config_dataset = 'IMDB'
 
@@ -119,33 +119,14 @@ config_data = {
 }
 
 
-config_model_save_path = {
-    'IMDB': r'./models/IMDB/{}_{:.5f}_{}_{}.pt',
-    'AGNEWS': r'./models/AGNEWS/{}_{:.5f}_{}_{}.pt',
-    'YAHOO': r'./models/YAHOO/{}_{:.5f}_{}_{}.pt',
-}
-
-config_model_lists = [
-    'LSTM', 'TextCNN', 'BidLSTM', 'BidLSTM_enhanced',
-    'TextCNN_enhanced', 'LSTM_enhanced', 'LSTM_adv',
-    'BidLSTM_adv', 'TextCNN_adv'
-]
-
 config_dataset_list = [
     'IMDB',
     'AGNEWS',
     'YAHOO',
 ]
 
-config_attack_list = [
-    'PWWS',
-    'TEXTFOOL',
-    'RANDOM'
-]
 
 config_pwws_use_NE = True
-config_RSE_mask_low = 2
-config_RSE_mask_rate = 0.25
 
 model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/models/IMDB_Bert_0.91328_05-12-14-47.pt',
               'IMDB_Bert': 'output/train_baseline_model/2021-05-11_21:36:13/models/IMDB_Bert_0.91564_05-11-22-58.pt'}
