@@ -435,5 +435,6 @@ if __name__ == '__main__':
             try_all += 1
         elif flag == 0:
             try_all += 1
+    print(f'attack_num:{try_all}')
     print(f'attack_acc:{success_num / try_all}')
     print(f'attack_time:{attack_time}')
