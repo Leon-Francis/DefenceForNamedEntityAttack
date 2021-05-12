@@ -4,7 +4,7 @@ import spacy
 from nltk.corpus import wordnet as wn
 from tools import str2seq, read_IMDB_text_data
 from config import config_device, config_pwws_use_NE, \
-    config_data, config_dataset, model_path
+    config_data, config_dataset, model_path, config_pww_NNE_attack
 import numpy as np
 from get_NE_list import NE_list
 from functools import partial
@@ -94,6 +94,7 @@ def PWWS(
 
     NE_tags = list(NE_candidates.keys())
     use_NE = config_pwws_use_NE  # whether use NE as a substitute
+    NNE_attack = config_pww_NNE_attack
 
     max_len = config_data[config_dataset].padding_maxlen
 
@@ -115,12 +116,14 @@ def PWWS(
                                                   NE_candidates[NER_tag])
                 candidates.append(candidate)
             else:
-                candidates = _generate_synonym_candidates(
-                    token=token, token_position=position, rank_fn=rank_fn)
+                if NNE_attack:
+                    candidates = _generate_synonym_candidates(
+                        token=token, token_position=position, rank_fn=rank_fn)
         else:
-            candidates = _generate_synonym_candidates(token=token,
-                                                      token_position=position,
-                                                      rank_fn=rank_fn)
+            if NNE_attack:
+                candidates = _generate_synonym_candidates(token=token,
+                                                          token_position=position,
+                                                          rank_fn=rank_fn)
 
         if len(candidates) == 0:
             continue
