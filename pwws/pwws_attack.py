@@ -314,7 +314,7 @@ def adversarial_paraphrase(input_text,
                            true_y,
                            net: nn.Module,
                            tokenizer,
-                           verbose=False,
+                           verbose=True,
                            sub_rate_limit=None):
     '''
     Compute a perturbation, greedily choosing the synonym if it causes the most
@@ -428,7 +428,7 @@ if __name__ == '__main__':
     attack_time = 0
     for idx, data in enumerate(datas):
         adv_s, flag, end = get_fool_sentence_pwws(data, labels[idx], idx, baseline_model,
-                                                  tokenizer, False, None)
+                                                  tokenizer, True, None)
         attack_time += end
         if flag == 1:
             success_num += 1
