@@ -10,12 +10,12 @@ class Baseline_Config:
     batch_size = 8
     dataset = 'IMDB'
     baseline = 'Bert'
-    epoch = 30
+    epoch = 15
     save_acc_limit = 0.85
 
     debug_mode = False
 
-    if_mask_NE = False
+    if_mask_NE = True
 
     linear_layer_num = 1
     dropout_rate = 0.5
