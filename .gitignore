@@ -5,3 +5,4 @@ dataset/
 baseline/logs/
 output/
 *.log
+pwws/NE_dict/
