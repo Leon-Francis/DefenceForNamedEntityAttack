@@ -8,7 +8,11 @@ nlp = spacy.load('en_core_web_sm')
 
 
 class IMDB_Dataset(Dataset):
-    def __init__(self, train_data=True, if_mask_NE=False, debug_mode=False):
+    def __init__(self,
+                 train_data=True,
+                 if_mask_NE=False,
+                 if_replace_NE=False,
+                 debug_mode=False):
         super(IMDB_Dataset, self).__init__()
         if train_data:
             self.path = IMDBConfig.train_data_path
@@ -20,7 +24,27 @@ class IMDB_Dataset(Dataset):
         self.sen_len = IMDBConfig.sen_len
         self.data_tokens = []
         self.data_idx = []
-        self.data2tokens(if_mask_NE)
+        replace_dict = {
+            'PERSON': 'name',
+            'NORP': 'group',
+            'FAC': 'building',
+            'ORG': 'company',
+            'GPE': 'country',
+            'LOC': 'location',
+            'PRODUCT': 'object',
+            'EVENT': 'event',
+            'WORK_OF_ART': 'book',
+            'LAW': 'law',
+            'LANGUAGE': 'language',
+            'DATE': 'date',
+            'TIME': 'time',
+            'PERCENT': 'percentage',
+            'MONEY': 'money',
+            'QUANTITY': 'quantity',
+            'ORDINAL': 'ordinal',
+            'CARDINAL': 'number'
+        }
+        self.data2tokens(replace_dict, if_mask_NE, if_replace_NE)
         self.token2idx()
         self.transfor()
 
@@ -47,7 +71,7 @@ class IMDB_Dataset(Dataset):
         logging(f'loading data {len(data)} from {path}')
         return data, labels
 
-    def data2tokens(self, if_mask_NE):
+    def data2tokens(self, replace_dict, if_mask_NE, if_replace_NE):
         logging(f'{self.path} in data2tokens')
         if if_mask_NE:
             for sen in self.datas:
@@ -60,7 +84,23 @@ class IMDB_Dataset(Dataset):
                     for idx in range(ent.start, ent.end):
                         tokens[idx] = '[MASK]'
                 masked_NE_string = ' '.join(tokens)
-                tokens = self.tokenizer.tokenize(masked_NE_string)[:self.sen_len]
+                tokens = self.tokenizer.tokenize(
+                    masked_NE_string)[:self.sen_len]
+                self.data_tokens.append(tokens)
+        elif if_replace_NE:
+            for sen in self.datas:
+                doc = nlp(sen)
+                tokens = []
+                for token in doc:
+                    string = str(token)
+                    tokens.append(string)
+                for ent in doc.ents:
+                    tokens[ent.start] = replace_dict[ent.label_]
+                    for idx in range(ent.start + 1, ent.end):
+                        tokens[idx] = ''
+                replaced_NE_string = ' '.join(tokens)
+                tokens = self.tokenizer.tokenize(
+                    replaced_NE_string)[:self.sen_len]
                 self.data_tokens.append(tokens)
         else:
             for sen in self.datas:
