@@ -49,47 +49,14 @@ def recognize_named_entity(texts):
 
 class NameEntityList(object):
     # If the original input in IMDB belongs to class 0 (negative)
-    imdb_0 = {
-        'PERSON': 'David',
-        'NORP': 'Australian',
-        'FAC': 'Hound',
-        'ORG': 'Ford',
-        'GPE': 'India',
-        'LOC': 'Atlantic',
-        'PRODUCT': 'Highly',
-        'EVENT': 'Depression',
-        'WORK_OF_ART': 'Casablanca',
-        'LAW': 'Constitution',
-        'LANGUAGE': 'Portuguese',
-        'DATE': '2001',
-        'TIME': 'hours',
-        'PERCENT': '98%',
-        'MONEY': '4',
-        'QUANTITY': '70mm',
-        'ORDINAL': '5th',
-        'CARDINAL': '7',
-    }
-    # If the original input in IMDB belongs to class 1 (positive)
-    imdb_1 = {
-        'PERSON': 'Lee',
-        'NORP': 'Christian',
-        'FAC': 'Shannon',
-        'ORG': 'Microsoft',
-        'GPE': 'Seagal',
-        'LOC': 'Malta',
-        'PRODUCT': 'Cat',
-        'EVENT': 'Hugo',
-        'WORK_OF_ART': 'Jaws',
-        'LAW': 'RICO',
-        'LANGUAGE': 'Sebastian',
-        'DATE': 'Friday',
-        'TIME': 'minutes',
-        'PERCENT': '75%',
-        'MONEY': '$',
-        'QUANTITY': '9mm',
-        'ORDINAL': 'sixth',
-        'CARDINAL': 'zero',
-    }
+    f_0 = open('pwws/NE_dict/imdb_adv_0.json', 'r')
+    content_0 = f_0.read()
+    imdb_0 = json.loads(content_0)
+    f_0.close()
+    f_1 = open('pwws/NE_dict/imdb_adv_1.json', 'r')
+    content_1 = f_1.read()
+    imdb_1 = json.loads(content_1)
+    f_1.close()
     imdb = [imdb_0, imdb_1]
     agnews_0 = {
         'PERSON': 'Williams',
@@ -406,10 +373,10 @@ if __name__ == '__main__':
     js_imdb_0 = json.dumps(imdb_adv_0)
     js_imdb_1 = json.dumps(imdb_adv_1)
 
-    fileObject_0 = open('pwws/NE_dict/imdb_adv_0.json', 'w')
+    fileObject_0 = open('pwws/NE_dict/imdb_adv_1.json', 'w')
     fileObject_0.write(js_imdb_0)
     fileObject_0.close()
 
-    fileObject_1 = open('pwws/NE_dict/imdb_adv_1.json', 'w')
+    fileObject_1 = open('pwws/NE_dict/imdb_adv_0.json', 'w')
     fileObject_1.write(js_imdb_1)
     fileObject_1.close()

@@ -38,7 +38,7 @@ def parse_bool(x):
     return None
 
 
-def read_IMDB_text_data():
+def read_IMDB_text_data(attempt_num):
     datas = []
     labels = []
     with open('./dataset/IMDB/aclImdb/test.std', 'r',
@@ -52,8 +52,8 @@ def read_IMDB_text_data():
     random.shuffle(datas)
     random.seed(randnum)
     random.shuffle(labels)
-    datas = datas[:200]
-    labels = labels[:200]
+    datas = datas[:attempt_num]
+    labels = labels[:attempt_num]
     logging(f'loading data {len(datas)}')
     return datas, labels
 

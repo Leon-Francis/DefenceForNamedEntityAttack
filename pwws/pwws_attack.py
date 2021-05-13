@@ -112,18 +112,19 @@ def PWWS(
         if use_NE:
             NER_tag = token.ent_type_
             if NER_tag in NE_tags:
-                candidate = SubstitutionCandidate(position, 0, token,
-                                                  NE_candidates[NER_tag])
-                candidates.append(candidate)
+                for idx, str in enumerate(NE_candidates[NER_tag]):
+                    if idx >= 200:
+                        break
+                    candidate = SubstitutionCandidate(position, 0, token, str)
+                    candidates.append(candidate)
             else:
                 if NNE_attack:
                     candidates = _generate_synonym_candidates(
                         token=token, token_position=position, rank_fn=rank_fn)
         else:
             if NNE_attack:
-                candidates = _generate_synonym_candidates(token=token,
-                                                          token_position=position,
-                                                          rank_fn=rank_fn)
+                candidates = _generate_synonym_candidates(
+                    token=token, token_position=position, rank_fn=rank_fn)
 
         if len(candidates) == 0:
             continue
@@ -413,31 +414,32 @@ def get_fool_sentence_pwws(sentence: str, label: int, index: int, net,
 
 
 if __name__ == '__main__':
+    attempt_num = 100
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    datas, labels = read_IMDB_text_data()
+    datas, labels = read_IMDB_text_data(attempt_num)
     baseline_model = Baseline_Bert(
         label_num=dataset_config[Baseline_Config.dataset].labels_num,
         linear_layer_num=Baseline_Config.linear_layer_num,
         dropout_rate=Baseline_Config.dropout_rate,
-        is_fine_tuning=Baseline_Config.is_fine_tuning).to(
-            config_device)
+        is_fine_tuning=Baseline_Config.is_fine_tuning).to(config_device)
     baseline_model.load_state_dict(
-        torch.load(model_path['IMDB_Bert_MNE'],
-                   map_location=config_device))
+        torch.load(model_path['IMDB_Bert'], map_location=config_device))
 
     baseline_model.eval()
     success_num = 0
     try_all = 0
     attack_time = 0
     for idx, data in enumerate(datas):
-        adv_s, flag, end = get_fool_sentence_pwws(data, labels[idx], idx, baseline_model,
-                                                  tokenizer, True, None)
+        adv_s, flag, end = get_fool_sentence_pwws(data, labels[idx], idx,
+                                                  baseline_model, tokenizer,
+                                                  True, None)
         attack_time += end
         if flag == 1:
             success_num += 1
             try_all += 1
         elif flag == 0:
             try_all += 1
+    print(f'attempt_num:{attempt_num}')
     print(f'attack_num:{try_all}')
     print(f'attack_acc:{success_num / try_all}')
     print(f'attack_time:{attack_time}')
