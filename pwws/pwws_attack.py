@@ -423,7 +423,7 @@ if __name__ == '__main__':
         dropout_rate=Baseline_Config.dropout_rate,
         is_fine_tuning=Baseline_Config.is_fine_tuning).to(config_device)
     baseline_model.load_state_dict(
-        torch.load(model_path['IMDB_Bert'], map_location=config_device))
+        torch.load(model_path['IMDB_Bert_replace_NE'], map_location=config_device))
 
     baseline_model.eval()
     success_num = 0
