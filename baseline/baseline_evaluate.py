@@ -47,6 +47,14 @@ if __name__ == '__main__':
     if_mask_NE = True
     if_replace_NE = False
     if_attach_NE = False
+    if if_mask_NE:
+        model_name = 'IMDB_Bert_MNE'
+    elif if_replace_NE:
+        model_name = 'IMDB_Bert_replace_NE'
+    elif if_attach_NE:
+        model_name = 'IMDB_Bert_attach_NE'
+    else:
+        model_name = 'IMDB_Bert'
 
     test_data = build_dataset(if_mask_NE, if_replace_NE, if_attach_NE)
 
@@ -58,7 +66,7 @@ if __name__ == '__main__':
             evaluate_device)
 
     baseline_model.load_state_dict(
-        torch.load(model_path['IMDB_Bert_MNE'], map_location=evaluate_device))
+        torch.load(model_path[model_name], map_location=evaluate_device))
 
     criterion = nn.CrossEntropyLoss().to(evaluate_device)
 
