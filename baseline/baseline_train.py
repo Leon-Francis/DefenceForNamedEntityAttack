@@ -19,10 +19,12 @@ def build_dataset():
     train_dataset_orig = IMDB_Dataset(train_data=True,
                                       if_mask_NE=Baseline_Config.if_mask_NE,
                                       if_replace_NE=Baseline_Config.if_replace_NE,
+                                      if_attach_NE=Baseline_Config.if_attach_NE,
                                       debug_mode=Baseline_Config.debug_mode)
     test_dataset_orig = IMDB_Dataset(train_data=False,
                                      if_mask_NE=Baseline_Config.if_mask_NE,
                                      if_replace_NE=Baseline_Config.if_replace_NE,
+                                     if_attach_NE=Baseline_Config.if_attach_NE,
                                      debug_mode=Baseline_Config.debug_mode)
     train_data = DataLoader(train_dataset_orig,
                             batch_size=Baseline_Config.batch_size,

@@ -4,6 +4,8 @@ import torch
 from torch.utils.data import Dataset
 from baseline_tools import logging
 from baseline_config import IMDBConfig
+from random import choice
+import json
 nlp = spacy.load('en_core_web_sm')
 
 
@@ -12,8 +14,10 @@ class IMDB_Dataset(Dataset):
                  train_data=True,
                  if_mask_NE=False,
                  if_replace_NE=False,
+                 if_attach_NE=False,
                  debug_mode=False):
         super(IMDB_Dataset, self).__init__()
+        self.train_model = train_data
         if train_data:
             self.path = IMDBConfig.train_data_path
         else:
@@ -24,7 +28,7 @@ class IMDB_Dataset(Dataset):
         self.sen_len = IMDBConfig.sen_len
         self.data_tokens = []
         self.data_idx = []
-        replace_dict = {
+        self.replace_dict = {
             'PERSON': 'name',
             'NORP': 'group',
             'FAC': 'building',
@@ -44,7 +48,16 @@ class IMDB_Dataset(Dataset):
             'ORDINAL': 'ordinal',
             'CARDINAL': 'number'
         }
-        self.data2tokens(replace_dict, if_mask_NE, if_replace_NE)
+        f_0 = open('pwws/NE_dict/imdb_adv_0.json', 'r')
+        content_0 = f_0.read()
+        imdb_0 = json.loads(content_0)
+        f_0.close()
+        f_1 = open('pwws/NE_dict/imdb_adv_1.json', 'r')
+        content_1 = f_1.read()
+        imdb_1 = json.loads(content_1)
+        f_1.close()
+        self.imdb_attach_NE = [imdb_0, imdb_1]
+        self.data2tokens(if_mask_NE, if_replace_NE, if_attach_NE)
         self.token2idx()
         self.transfor()
 
@@ -71,9 +84,9 @@ class IMDB_Dataset(Dataset):
         logging(f'loading data {len(data)} from {path}')
         return data, labels
 
-    def data2tokens(self, replace_dict, if_mask_NE, if_replace_NE):
+    def data2tokens(self, if_mask_NE, if_replace_NE, if_attach_NE):
         logging(f'{self.path} in data2tokens')
-        if if_mask_NE:
+        if self.train_model and if_mask_NE:
             for sen in self.datas:
                 doc = nlp(sen)
                 tokens = []
@@ -87,7 +100,7 @@ class IMDB_Dataset(Dataset):
                 tokens = self.tokenizer.tokenize(
                     masked_NE_string)[:self.sen_len]
                 self.data_tokens.append(tokens)
-        elif if_replace_NE:
+        elif self.train_model and if_replace_NE:
             for sen in self.datas:
                 doc = nlp(sen)
                 tokens = []
@@ -95,13 +108,36 @@ class IMDB_Dataset(Dataset):
                     string = str(token)
                     tokens.append(string)
                 for ent in doc.ents:
-                    tokens[ent.start] = replace_dict[ent.label_]
+                    tokens[ent.start] = self.replace_dict[ent.label_]
                     for idx in range(ent.start + 1, ent.end):
                         tokens[idx] = ''
                 replaced_NE_string = ' '.join(tokens)
                 tokens = self.tokenizer.tokenize(
                     replaced_NE_string)[:self.sen_len]
                 self.data_tokens.append(tokens)
+        elif self.train_model and if_attach_NE:
+            temp_label_list = []
+            for sen_idx, sen in enumerate(self.datas):
+                tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
+                self.data_tokens.append(tokens)
+                temp_label_list.append(self.classification_label[sen_idx])
+                doc = nlp(sen)
+                for _ in range(5):
+                    tokens = []
+                    for token in doc:
+                        string = str(token)
+                        tokens.append(string)
+                    for ent in doc.ents:
+                        tokens[ent.start] = choice(
+                            choice(self.imdb_attach_NE)[ent.label_])
+                        for idx in range(ent.start + 1, ent.end):
+                            tokens[idx] = ''
+                    attach_NE_string = ' '.join(tokens)
+                    tokens = self.tokenizer.tokenize(
+                        attach_NE_string)[:self.sen_len]
+                    self.data_tokens.append(tokens)
+                    temp_label_list.append(self.classification_label[sen_idx])
+            self.classification_label = temp_label_list
         else:
             for sen in self.datas:
                 tokens = self.tokenizer.tokenize(sen)[:self.sen_len]

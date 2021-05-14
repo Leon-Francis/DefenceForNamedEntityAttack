@@ -16,7 +16,8 @@ class Baseline_Config:
     debug_mode = False
 
     if_mask_NE = False
-    if_replace_NE = True
+    if_replace_NE = False
+    if_attach_NE = True
 
     linear_layer_num = 1
     dropout_rate = 0.5
