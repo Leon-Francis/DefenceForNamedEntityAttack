@@ -65,7 +65,7 @@ class IMDB_Dataset(Dataset):
         data = []
         labels = []
         if debug_mode:
-            i = 1000
+            i = 100
             with open(path, 'r', encoding='utf-8') as file:
                 for line in file:
                     i -= 1
@@ -117,19 +117,24 @@ class IMDB_Dataset(Dataset):
                 self.data_tokens.append(tokens)
         elif self.train_model and if_attach_NE:
             temp_label_list = []
+            NE_samples = 0
+            NE_nums = 0
             for sen_idx, sen in enumerate(self.datas):
                 tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
                 self.data_tokens.append(tokens)
                 temp_label_list.append(self.classification_label[sen_idx])
                 doc = nlp(sen)
-                for _ in range(5):
+                if (len(doc.ents) > 0):
+                    NE_samples += 1
+                    NE_nums += len(doc.ents)
+                for _ in range(len(doc.ents)):
                     tokens = []
                     for token in doc:
                         string = str(token)
                         tokens.append(string)
                     for ent in doc.ents:
-                        tokens[ent.start] = choice(
-                            choice(self.imdb_attach_NE)[ent.label_])
+                        tokens[ent.start] = choice(self.imdb_attach_NE[
+                            self.classification_label[sen_idx]][ent.label_])
                         for idx in range(ent.start + 1, ent.end):
                             tokens[idx] = ''
                     attach_NE_string = ' '.join(tokens)
@@ -138,6 +143,7 @@ class IMDB_Dataset(Dataset):
                     self.data_tokens.append(tokens)
                     temp_label_list.append(self.classification_label[sen_idx])
             self.classification_label = temp_label_list
+            logging(f'NE samples = {NE_samples}\nNE nums = {NE_nums}')
         else:
             for sen in self.datas:
                 tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
