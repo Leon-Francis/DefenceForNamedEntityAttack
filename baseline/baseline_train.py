@@ -1,4 +1,4 @@
-from baseline_data import IMDB_Dataset
+from baseline_data import IMDB_Dataset, SST2_Dataset, AGNEWS_Dataset
 import torch
 from torch.utils.data import DataLoader
 from torch import nn, optim
@@ -16,16 +16,31 @@ def save_config(path):
 
 
 def build_dataset():
-    train_dataset_orig = IMDB_Dataset(train_data=True,
-                                      if_mask_NE=Baseline_Config.if_mask_NE,
-                                      if_replace_NE=Baseline_Config.if_replace_NE,
-                                      if_attach_NE=Baseline_Config.if_attach_NE,
-                                      debug_mode=Baseline_Config.debug_mode)
-    test_dataset_orig = IMDB_Dataset(train_data=False,
-                                     if_mask_NE=Baseline_Config.if_mask_NE,
-                                     if_replace_NE=Baseline_Config.if_replace_NE,
-                                     if_attach_NE=Baseline_Config.if_attach_NE,
-                                     debug_mode=Baseline_Config.debug_mode)
+    if Baseline_Config.dataset == 'IMDB':
+        train_dataset_orig = IMDB_Dataset(train_data=True,
+                                          if_mask_NE=Baseline_Config.if_mask_NE,
+                                          if_replace_NE=Baseline_Config.if_replace_NE,
+                                          if_attach_NE=Baseline_Config.if_attach_NE,
+                                          debug_mode=Baseline_Config.debug_mode)
+        test_dataset_orig = IMDB_Dataset(train_data=False,
+                                         if_mask_NE=Baseline_Config.if_mask_NE,
+                                         if_replace_NE=Baseline_Config.if_replace_NE,
+                                         if_attach_NE=Baseline_Config.if_attach_NE,
+                                         debug_mode=Baseline_Config.debug_mode)
+    elif Baseline_Config.dataset == 'SST2':
+        train_dataset_orig = SST2_Dataset(train_data=True,
+                                          if_attach_NE=Baseline_Config.if_attach_NE,
+                                          debug_mode=Baseline_Config.debug_mode)
+        test_dataset_orig = SST2_Dataset(train_data=False,
+                                         if_attach_NE=Baseline_Config.if_attach_NE,
+                                         debug_mode=Baseline_Config.debug_mode)
+    elif Baseline_Config.dataset == 'AGNEWS':
+        train_dataset_orig = AGNEWS_Dataset(train_data=True,
+                                            if_attach_NE=Baseline_Config.if_attach_NE,
+                                            debug_mode=Baseline_Config.debug_mode)
+        test_dataset_orig = AGNEWS_Dataset(train_data=False,
+                                           if_attach_NE=Baseline_Config.if_attach_NE,
+                                           debug_mode=Baseline_Config.debug_mode)
     train_data = DataLoader(train_dataset_orig,
                             batch_size=Baseline_Config.batch_size,
                             shuffle=True,

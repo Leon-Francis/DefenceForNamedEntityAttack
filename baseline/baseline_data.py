@@ -3,7 +3,7 @@ import spacy
 import torch
 from torch.utils.data import Dataset
 from baseline_tools import logging
-from baseline_config import IMDBConfig
+from baseline_config import IMDBConfig, SST2Config, AGNEWSConfig
 from random import choice
 import json
 nlp = spacy.load('en_core_web_sm')
@@ -134,6 +134,239 @@ class IMDB_Dataset(Dataset):
                         tokens.append(string)
                     for ent in doc.ents:
                         tokens[ent.start] = choice(self.imdb_attach_NE[
+                            self.classification_label[sen_idx]][ent.label_])
+                        for idx in range(ent.start + 1, ent.end):
+                            tokens[idx] = ''
+                    attach_NE_string = ' '.join(tokens)
+                    tokens = self.tokenizer.tokenize(
+                        attach_NE_string)[:self.sen_len]
+                    self.data_tokens.append(tokens)
+                    temp_label_list.append(self.classification_label[sen_idx])
+            self.classification_label = temp_label_list
+            logging(f'NE samples = {NE_samples}\nNE nums = {NE_nums}')
+        else:
+            for sen in self.datas:
+                tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
+                self.data_tokens.append(tokens)
+
+    def token2idx(self):
+        logging(f'{self.path} in token2idx')
+        for tokens in self.data_tokens:
+            self.data_idx.append(self.tokenizer.convert_tokens_to_ids(tokens))
+
+        for i in range(len(self.data_idx)):
+            if len(self.data_idx[i]) < self.sen_len:
+                self.data_idx[i] += [0
+                                     ] * (self.sen_len - len(self.data_idx[i]))
+
+    def transfor(self):
+        self.data_idx = torch.tensor(self.data_idx)
+        self.classification_label = torch.tensor(self.classification_label)
+
+    def __getitem__(self, item):
+        return self.data_idx[item], self.classification_label[item]
+
+    def __len__(self):
+        return len(self.data_idx)
+
+
+class SST2_Dataset(Dataset):
+    def __init__(self,
+                 train_data=True,
+                 if_attach_NE=False,
+                 debug_mode=False):
+        super(SST2_Dataset, self).__init__()
+        self.train_model = train_data
+        if train_data:
+            self.path = SST2Config.train_data_path
+        else:
+            self.path = SST2Config.test_data_path
+        self.datas, self.classification_label = self.read_standard_data(
+            self.path, debug_mode)
+        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        self.sen_len = SST2Config.sen_len
+        self.data_tokens = []
+        self.data_idx = []
+
+        f_0 = open('pwws/NE_dict/SST2_adv_0.json', 'r')
+        content_0 = f_0.read()
+        sst2_0 = json.loads(content_0)
+        f_0.close()
+        f_1 = open('pwws/NE_dict/SST2_adv_1.json', 'r')
+        content_1 = f_1.read()
+        sst2_1 = json.loads(content_1)
+        f_1.close()
+        self.sst2_attach_NE = [sst2_0, sst2_1]
+
+        self.data2tokens(if_attach_NE)
+        self.token2idx()
+        self.transfor()
+
+    def read_standard_data(self, path, debug_mode=False):
+        data = []
+        labels = []
+        if debug_mode:
+            i = 100
+            with open(path, 'r', encoding='utf-8') as file:
+                for line in file:
+                    i -= 1
+                    line = line.strip('\n')
+                    data.append(line[:-1])
+                    labels.append(int(line[-1]))
+                    if i == 0:
+                        break
+            logging(f'loading data {len(data)} from {path}')
+            return data, labels
+        with open(path, 'r', encoding='utf-8') as file:
+            for line in file:
+                line = line.strip('\n')
+                data.append(line[:-1])
+                labels.append(int(line[-1]))
+        logging(f'loading data {len(data)} from {path}')
+        return data, labels
+
+    def data2tokens(self, if_attach_NE):
+        logging(f'{self.path} in data2tokens')
+        if self.train_model and if_attach_NE:
+            temp_label_list = []
+            NE_samples = 0
+            NE_nums = 0
+            for sen_idx, sen in enumerate(self.datas):
+                tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
+                self.data_tokens.append(tokens)
+                temp_label_list.append(self.classification_label[sen_idx])
+                doc = nlp(sen)
+                if (len(doc.ents) > 0):
+                    NE_samples += 1
+                    NE_nums += len(doc.ents)
+                for _ in range(len(doc.ents)):
+                    tokens = []
+                    for token in doc:
+                        string = str(token)
+                        tokens.append(string)
+                    for ent in doc.ents:
+                        tokens[ent.start] = choice(self.sst2_attach_NE[
+                            self.classification_label[sen_idx]][ent.label_])
+                        for idx in range(ent.start + 1, ent.end):
+                            tokens[idx] = ''
+                    attach_NE_string = ' '.join(tokens)
+                    tokens = self.tokenizer.tokenize(
+                        attach_NE_string)[:self.sen_len]
+                    self.data_tokens.append(tokens)
+                    temp_label_list.append(self.classification_label[sen_idx])
+            self.classification_label = temp_label_list
+            logging(f'NE samples = {NE_samples}\nNE nums = {NE_nums}')
+        else:
+            for sen in self.datas:
+                tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
+                self.data_tokens.append(tokens)
+
+    def token2idx(self):
+        logging(f'{self.path} in token2idx')
+        for tokens in self.data_tokens:
+            self.data_idx.append(self.tokenizer.convert_tokens_to_ids(tokens))
+
+        for i in range(len(self.data_idx)):
+            if len(self.data_idx[i]) < self.sen_len:
+                self.data_idx[i] += [0
+                                     ] * (self.sen_len - len(self.data_idx[i]))
+
+    def transfor(self):
+        self.data_idx = torch.tensor(self.data_idx)
+        self.classification_label = torch.tensor(self.classification_label)
+
+    def __getitem__(self, item):
+        return self.data_idx[item], self.classification_label[item]
+
+    def __len__(self):
+        return len(self.data_idx)
+
+
+class AGNEWS_Dataset(Dataset):
+    def __init__(self,
+                 train_data=True,
+                 if_attach_NE=False,
+                 debug_mode=False):
+        super(AGNEWS_Dataset, self).__init__()
+        self.train_model = train_data
+        if train_data:
+            self.path = AGNEWSConfig.train_data_path
+        else:
+            self.path = AGNEWSConfig.test_data_path
+        self.datas, self.classification_label = self.read_standard_data(
+            self.path, debug_mode)
+        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        self.sen_len = AGNEWSConfig.sen_len
+        self.data_tokens = []
+        self.data_idx = []
+
+        f_0 = open('pwws/NE_dict/AGNEWS_adv_0.json', 'r')
+        content_0 = f_0.read()
+        agnews_0 = json.loads(content_0)
+        f_0.close()
+        f_1 = open('pwws/NE_dict/AGNEWS_adv_1.json', 'r')
+        content_1 = f_1.read()
+        agnews_1 = json.loads(content_1)
+        f_1.close()
+        f_2 = open('pwws/NE_dict/AGNEWS_adv_2.json', 'r')
+        content_2 = f_2.read()
+        agnews_2 = json.loads(content_2)
+        f_2.close()
+        f_3 = open('pwws/NE_dict/AGNEWS_adv_3.json', 'r')
+        content_3 = f_3.read()
+        agnews_3 = json.loads(content_3)
+        f_3.close()
+
+        self.agnews_attach_NE = [agnews_0, agnews_1, agnews_2, agnews_3]
+
+        self.data2tokens(if_attach_NE)
+        self.token2idx()
+        self.transfor()
+
+    def read_standard_data(self, path, debug_mode=False):
+        data = []
+        labels = []
+        if debug_mode:
+            i = 100
+            with open(path, 'r', encoding='utf-8') as file:
+                for line in file:
+                    i -= 1
+                    line = line.strip('\n')
+                    data.append(line[:-1])
+                    labels.append(int(line[-1]))
+                    if i == 0:
+                        break
+            logging(f'loading data {len(data)} from {path}')
+            return data, labels
+        with open(path, 'r', encoding='utf-8') as file:
+            for line in file:
+                line = line.strip('\n')
+                data.append(line[:-1])
+                labels.append(int(line[-1]))
+        logging(f'loading data {len(data)} from {path}')
+        return data, labels
+
+    def data2tokens(self, if_attach_NE):
+        logging(f'{self.path} in data2tokens')
+        if self.train_model and if_attach_NE:
+            temp_label_list = []
+            NE_samples = 0
+            NE_nums = 0
+            for sen_idx, sen in enumerate(self.datas):
+                tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
+                self.data_tokens.append(tokens)
+                temp_label_list.append(self.classification_label[sen_idx])
+                doc = nlp(sen)
+                if (len(doc.ents) > 0):
+                    NE_samples += 1
+                    NE_nums += len(doc.ents)
+                for _ in range(len(doc.ents)):
+                    tokens = []
+                    for token in doc:
+                        string = str(token)
+                        tokens.append(string)
+                    for ent in doc.ents:
+                        tokens[ent.start] = choice(self.agnews_attach_NE[
                             self.classification_label[sen_idx]][ent.label_])
                         for idx in range(ent.start + 1, ent.end):
                             tokens[idx] = ''

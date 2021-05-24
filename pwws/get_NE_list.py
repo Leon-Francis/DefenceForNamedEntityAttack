@@ -338,11 +338,13 @@ NE_list = NameEntityList()
 
 if __name__ == '__main__':
 
-    imdb_0 = defaultdict(list)
-    imdb_1 = defaultdict(list)
+    agnews_0 = defaultdict(list)
+    agnews_1 = defaultdict(list)
+    agnews_2 = defaultdict(list)
+    agnews_3 = defaultdict(list)
     datas = []
     labels = []
-    with open(r'./dataset/IMDB/aclImdb/train.std', 'r',
+    with open(r'./dataset/AGNEWS/train.std', 'r',
               encoding='utf-8') as file:
         for line in file:
             line = line.strip('\n')
@@ -352,31 +354,92 @@ if __name__ == '__main__':
         doc = nlp(sen)
         for ent in doc.ents:
             if labels[idx] == 0:
-                if ent.lower_ not in imdb_0[ent.label_]:
-                    imdb_0[ent.label_].append(ent.lower_)
-            else:
-                if ent.lower_ not in imdb_1[ent.label_]:
-                    imdb_1[ent.label_].append(ent.lower_)
+                if ent.lower_ not in agnews_0[ent.label_]:
+                    agnews_0[ent.label_].append(ent.lower_)
+            elif labels[idx] == 1:
+                if ent.lower_ not in agnews_1[ent.label_]:
+                    agnews_1[ent.label_].append(ent.lower_)
+            elif labels[idx] == 2:
+                if ent.lower_ not in agnews_2[ent.label_]:
+                    agnews_2[ent.label_].append(ent.lower_)
+            elif labels[idx] == 3:
+                if ent.lower_ not in agnews_3[ent.label_]:
+                    agnews_3[ent.label_].append(ent.lower_)
 
-    imdb_adv_0 = defaultdict(list)
-    imdb_adv_1 = defaultdict(list)
-    for key, value in imdb_0.items():
+    agnews_adv_0 = defaultdict(list)
+    agnews_adv_1 = defaultdict(list)
+    agnews_adv_2 = defaultdict(list)
+    agnews_adv_3 = defaultdict(list)
+
+    for key, value in agnews_1.items():
         for str in value:
-            if str not in imdb_1[key]:
-                imdb_adv_0[key].append(str)
-
-    for key, value in imdb_1.items():
+            if str not in agnews_0[key]:
+                agnews_adv_0[key].append(str)
+    for key, value in agnews_2.items():
         for str in value:
-            if str not in imdb_0[key]:
-                imdb_adv_1[key].append(str)
+            if str not in agnews_0[key]:
+                agnews_adv_0[key].append(str)
+    for key, value in agnews_3.items():
+        for str in value:
+            if str not in agnews_0[key]:
+                agnews_adv_0[key].append(str)
 
-    js_imdb_0 = json.dumps(imdb_adv_0)
-    js_imdb_1 = json.dumps(imdb_adv_1)
+    for key, value in agnews_0.items():
+        for str in value:
+            if str not in agnews_1[key]:
+                agnews_adv_1[key].append(str)
+    for key, value in agnews_2.items():
+        for str in value:
+            if str not in agnews_1[key]:
+                agnews_adv_1[key].append(str)
+    for key, value in agnews_3.items():
+        for str in value:
+            if str not in agnews_1[key]:
+                agnews_adv_1[key].append(str)
 
-    fileObject_0 = open('pwws/NE_dict/imdb_adv_1.json', 'w')
-    fileObject_0.write(js_imdb_0)
+    for key, value in agnews_0.items():
+        for str in value:
+            if str not in agnews_2[key]:
+                agnews_adv_2[key].append(str)
+    for key, value in agnews_1.items():
+        for str in value:
+            if str not in agnews_2[key]:
+                agnews_adv_2[key].append(str)
+    for key, value in agnews_3.items():
+        for str in value:
+            if str not in agnews_2[key]:
+                agnews_adv_2[key].append(str)
+
+    for key, value in agnews_0.items():
+        for str in value:
+            if str not in agnews_3[key]:
+                agnews_adv_3[key].append(str)
+    for key, value in agnews_1.items():
+        for str in value:
+            if str not in agnews_3[key]:
+                agnews_adv_3[key].append(str)
+    for key, value in agnews_2.items():
+        for str in value:
+            if str not in agnews_3[key]:
+                agnews_adv_3[key].append(str)
+
+    js_agnews_0 = json.dumps(agnews_adv_0)
+    js_agnews_1 = json.dumps(agnews_adv_1)
+    js_agnews_2 = json.dumps(agnews_adv_2)
+    js_agnews_3 = json.dumps(agnews_adv_3)
+
+    fileObject_0 = open('pwws/NE_dict/AGNEWS_adv_0.json', 'w')
+    fileObject_0.write(js_agnews_0)
     fileObject_0.close()
 
-    fileObject_1 = open('pwws/NE_dict/imdb_adv_0.json', 'w')
-    fileObject_1.write(js_imdb_1)
+    fileObject_1 = open('pwws/NE_dict/AGNEWS_adv_1.json', 'w')
+    fileObject_1.write(js_agnews_1)
     fileObject_1.close()
+
+    fileObject_2 = open('pwws/NE_dict/AGNEWS_adv_2.json', 'w')
+    fileObject_2.write(js_agnews_2)
+    fileObject_2.close()
+
+    fileObject_3 = open('pwws/NE_dict/AGNEWS_adv_3.json', 'w')
+    fileObject_3.write(js_agnews_3)
+    fileObject_3.close()
