@@ -113,7 +113,7 @@ def PWWS(
             NER_tag = token.ent_type_
             if NER_tag in NE_tags:
                 for idx, str in enumerate(NE_candidates[NER_tag]):
-                    if idx >= 200:
+                    if idx >= 250:
                         break
                     candidate = SubstitutionCandidate(position, 0, token, str)
                     candidates.append(candidate)
