@@ -5,12 +5,12 @@ bert_vocab_size = 30522
 
 class Baseline_Config:
     output_dir = 'output'
-    cuda_idx = 0
+    cuda_idx = 1
     train_device = torch.device('cuda:' + str(cuda_idx))
-    batch_size = 64
+    batch_size = 8
     dataset = 'SST2'
     baseline = 'Bert'
-    epoch = 15
+    epoch = 30
     save_acc_limit = 0.85
 
     debug_mode = False
@@ -18,14 +18,14 @@ class Baseline_Config:
     if_mask_NE = False
     if_replace_NE = False
 
-    if_attach_NE = False
+    if_attach_NE = True
 
-    linear_layer_num = 2
+    linear_layer_num = 1
     dropout_rate = 0.5
     is_fine_tuning = True
 
     Bert_lr = 1e-5
-    lr = 1e-3
+    lr = 1e-4
     skip_loss = 0.16
 
 
