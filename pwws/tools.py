@@ -38,16 +38,16 @@ def parse_bool(x):
     return None
 
 
-def read_IMDB_text_data(attempt_num):
+def read_text_data(config_dataset_path, attempt_num):
     datas = []
     labels = []
-    with open('./dataset/IMDB/aclImdb/test.std', 'r',
+    with open(config_dataset_path, 'r',
               encoding='utf-8') as file:
         for line in file:
             line = line.strip('\n')
             datas.append(line[:-1])
             labels.append(int(line[-1]))
-    randnum = random.randint(0,100)
+    randnum = random.randint(0, 100)
     random.seed(randnum)
     random.shuffle(datas)
     random.seed(randnum)

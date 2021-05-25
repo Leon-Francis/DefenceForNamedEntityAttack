@@ -3,7 +3,7 @@ config_path = './baseline/baseline_config.py'
 bert_vocab_size = 30522
 
 
-class Baseline_Config:
+class Baseline_Config():
     output_dir = 'output'
     cuda_idx = 1
     train_device = torch.device('cuda:' + str(cuda_idx))
@@ -66,4 +66,6 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'IMDB_Bert_replace_NE': 'output/train_baseline_model/2021-05-13_21:20:48/models/IMDB_Bert_0.91096_05-13-22-37.pt',
               'IMDB_Bert_attach_NE': 'output/train_baseline_model/2021-05-14_21:39:33/models/IMDB_Bert_0.91680_05-15-04-01.pt',
               'IMDB_Bert_attach_NE_inhance': 'output/train_baseline_model/2021-05-18_19:47:01/models/IMDB_Bert_0.91008_05-19-05-14.pt',
-              'IMDB_Bert': 'output/train_baseline_model/2021-05-11_21:36:13/models/IMDB_Bert_0.91564_05-11-22-58.pt'}
+              'IMDB_Bert': 'output/train_baseline_model/2021-05-11_21:36:13/models/IMDB_Bert_0.91564_05-11-22-58.pt',
+              'SST2_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_11:01:06/models/SST2_Bert_0.85592_05-25-11-08.pt',
+              'SST2_Bert': 'output/train_baseline_model/2021-05-24_22:50:17/models/SST2_Bert_0.87078_05-24-22-59.pt'}

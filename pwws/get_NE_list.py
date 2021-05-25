@@ -58,280 +58,37 @@ class NameEntityList(object):
     imdb_1 = json.loads(content_1)
     f_1.close()
     imdb = [imdb_0, imdb_1]
-    agnews_0 = {
-        'PERSON': 'Williams',
-        'NORP': 'European',
-        'FAC': 'Olympic',
-        'ORG': 'Microsoft',
-        'GPE': 'Australia',
-        'LOC': 'Earth',
-        'PRODUCT': '#',
-        'EVENT': 'Cup',
-        'WORK_OF_ART': 'PowerBook',
-        'LAW': 'Pacers-Pistons',
-        'LANGUAGE': 'Chinese',
-        'DATE': 'third-quarter',
-        'TIME': 'Tonight',
-        'MONEY': '#39;t',
-        'QUANTITY': '#39;t',
-        'ORDINAL': '11th',
-        'CARDINAL': '1',
-    }
-    agnews_1 = {
-        'PERSON': 'Bush',
-        'NORP': 'Iraqi',
-        'FAC': 'Outlook',
-        'ORG': 'Microsoft',
-        'GPE': 'Iraq',
-        'LOC': 'Asia',
-        'PRODUCT': '#',
-        'EVENT': 'Series',
-        'WORK_OF_ART': 'Nobel',
-        'LAW': 'Constitution',
-        'LANGUAGE': 'French',
-        'DATE': 'third-quarter',
-        'TIME': 'hours',
-        'MONEY': '39;Keefe',
-        'ORDINAL': '2nd',
-        'CARDINAL': 'Two',
-    }
-    agnews_2 = {
-        'PERSON': 'Arafat',
-        'NORP': 'Iraqi',
-        'FAC': 'Olympic',
-        'ORG': 'AFP',
-        'GPE': 'Baghdad',
-        'LOC': 'Earth',
-        'PRODUCT': 'Soyuz',
-        'EVENT': 'Cup',
-        'WORK_OF_ART': 'PowerBook',
-        'LAW': 'Constitution',
-        'LANGUAGE': 'Filipino',
-        'DATE': 'Sunday',
-        'TIME': 'evening',
-        'MONEY': '39;m',
-        'QUANTITY': '20km',
-        'ORDINAL': 'eighth',
-        'CARDINAL': '6',
-    }
-    agnews_3 = {
-        'PERSON': 'Arafat',
-        'NORP': 'Iraqi',
-        'FAC': 'Olympic',
-        'ORG': 'AFP',
-        'GPE': 'Iraq',
-        'LOC': 'Kashmir',
-        'PRODUCT': 'Yukos',
-        'EVENT': 'Cup',
-        'WORK_OF_ART': 'Gazprom',
-        'LAW': 'Pacers-Pistons',
-        'LANGUAGE': 'Hebrew',
-        'DATE': 'Saturday',
-        'TIME': 'overnight',
-        'MONEY': '39;m',
-        'QUANTITY': '#39;t',
-        'ORDINAL': '11th',
-        'CARDINAL': '6',
-    }
+
+    f_0 = open('pwws/NE_dict/SST2_adv_0.json', 'r')
+    content_0 = f_0.read()
+    sst2_0 = json.loads(content_0)
+    f_0.close()
+    f_1 = open('pwws/NE_dict/SST2_adv_1.json', 'r')
+    content_1 = f_1.read()
+    sst2_1 = json.loads(content_1)
+    f_1.close()
+    sst2 = [sst2_0, sst2_1]
+
+    f_0 = open('pwws/NE_dict/AGNEWS_adv_0.json', 'r')
+    content_0 = f_0.read()
+    agnews_0 = json.loads(content_0)
+    f_0.close()
+    f_1 = open('pwws/NE_dict/AGNEWS_adv_1.json', 'r')
+    content_1 = f_1.read()
+    agnews_1 = json.loads(content_1)
+    f_1.close()
+    f_2 = open('pwws/NE_dict/AGNEWS_adv_2.json', 'r')
+    content_2 = f_2.read()
+    agnews_2 = json.loads(content_2)
+    f_2.close()
+    f_3 = open('pwws/NE_dict/AGNEWS_adv_3.json', 'r')
+    content_3 = f_3.read()
+    agnews_3 = json.loads(content_3)
+    f_3.close()
+
     agnews = [agnews_0, agnews_1, agnews_2, agnews_3]
-    yahoo_0 = {
-        'PERSON': 'Fantasy',
-        'NORP': 'Russian',
-        'FAC': 'Taxation',
-        'ORG': 'Congress',
-        'GPE': 'U.S.',
-        'LOC': 'Sea',
-        'PRODUCT': 'Variable',
-        'EVENT': 'Series',
-        'WORK_OF_ART': 'Stopping',
-        'LAW': 'Constitution',
-        'LANGUAGE': 'Hebrew',
-        'DATE': '2004-05',
-        'TIME': 'morning',
-        'MONEY': '$ale',
-        'QUANTITY': 'Hiberno-English',
-        'ORDINAL': 'Tertiary',
-        'CARDINAL': 'three',
-    }
-    yahoo_1 = {
-        'PERSON': 'Equine',
-        'NORP': 'Japanese',
-        'FAC': 'Music',
-        'ORG': 'Congress',
-        'GPE': 'UK',
-        'LOC': 'Sea',
-        'PRODUCT': 'RuneScape',
-        'EVENT': 'Series',
-        'WORK_OF_ART': 'Stopping',
-        'LAW': 'Strap-',
-        'LANGUAGE': 'Spanish',
-        'DATE': '2004-05',
-        'TIME': 'night',
-        'PERCENT': '100%',
-        'MONEY': 'five-dollar',
-        'QUANTITY': 'Hiberno-English',
-        'ORDINAL': 'Sixth',
-        'CARDINAL': '5',
-    }
-    yahoo_2 = {
-        'PERSON': 'Equine',
-        'NORP': 'Canadian',
-        'FAC': 'Music',
-        'ORG': 'Congress',
-        'GPE': 'California',
-        'LOC': 'Atlantic',
-        'PRODUCT': 'Variable',
-        'EVENT': 'Series',
-        'WORK_OF_ART': 'Weight',
-        'LANGUAGE': 'Filipino',
-        'DATE': '2004-05',
-        'TIME': 'night',
-        'PERCENT': '100%',
-        'MONEY': 'ten-dollar',
-        'QUANTITY': '$ale',
-        'ORDINAL': 'Tertiary',
-        'CARDINAL': 'two',
-    }
-    yahoo_3 = {
-        'PERSON': 'Equine',
-        'NORP': 'Irish',
-        'FAC': 'Music',
-        'ORG': 'Congress',
-        'GPE': 'California',
-        'LOC': 'Sea',
-        'PRODUCT': 'RuneScape',
-        'EVENT': 'Series',
-        'WORK_OF_ART': 'Weight',
-        'LAW': 'Strap-',
-        'LANGUAGE': 'Spanish',
-        'DATE': '2004-05',
-        'TIME': 'tonight',
-        'PERCENT': '100%',
-        'MONEY': 'five-dollar',
-        'QUANTITY': 'Hiberno-English',
-        'ORDINAL': 'Sixth',
-        'CARDINAL': '5',
-    }
-    yahoo_4 = {
-        'PERSON': 'Equine',
-        'NORP': 'Irish',
-        'FAC': 'Music',
-        'ORG': 'Congress',
-        'GPE': 'Canada',
-        'LOC': 'Sea',
-        'PRODUCT': 'Variable',
-        'WORK_OF_ART': 'Stopping',
-        'LAW': 'Constitution',
-        'LANGUAGE': 'Spanish',
-        'DATE': '2004-05',
-        'TIME': 'seconds',
-        'PERCENT': '100%',
-        'MONEY': 'hundred-dollar',
-        'QUANTITY': 'Hiberno-English',
-        'ORDINAL': 'Tertiary',
-        'CARDINAL': '100',
-    }
-    yahoo_5 = {
-        'PERSON': 'Equine',
-        'NORP': 'English',
-        'FAC': 'Music',
-        'ORG': 'Congress',
-        'GPE': 'Australia',
-        'LOC': 'Sea',
-        'PRODUCT': 'Variable',
-        'EVENT': 'Series',
-        'WORK_OF_ART': 'Weight',
-        'LAW': 'Strap-',
-        'LANGUAGE': 'Filipino',
-        'DATE': '2004-05',
-        'TIME': 'seconds',
-        'MONEY': 'hundred-dollar',
-        'ORDINAL': 'Tertiary',
-        'CARDINAL': '2000',
-    }
-    yahoo_6 = {
-        'PERSON': 'Fantasy',
-        'NORP': 'Islamic',
-        'FAC': 'Music',
-        'ORG': 'Congress',
-        'GPE': 'California',
-        'LOC': 'Sea',
-        'PRODUCT': 'Variable',
-        'EVENT': 'Series',
-        'WORK_OF_ART': 'Stopping',
-        'LANGUAGE': 'Filipino',
-        'DATE': '2004-05',
-        'TIME': 'seconds',
-        'PERCENT': '100%',
-        'MONEY': '$ale',
-        'QUANTITY': '$ale',
-        'ORDINAL': 'Tertiary',
-        'CARDINAL': '100',
-    }
-    yahoo_7 = {
-        'PERSON': 'Fantasy',
-        'NORP': 'Canadian',
-        'FAC': 'Music',
-        'ORG': 'Congress',
-        'GPE': 'UK',
-        'LOC': 'West',
-        'PRODUCT': 'Variable',
-        'EVENT': 'Watergate',
-        'WORK_OF_ART': 'Stopping',
-        'LAW': 'Constitution',
-        'LANGUAGE': 'Filipino',
-        'DATE': '2004-05',
-        'TIME': 'tonight',
-        'PERCENT': '100%',
-        'MONEY': '$ale',
-        'QUANTITY': '$ale',
-        'ORDINAL': 'Tertiary',
-        'CARDINAL': '2000',
-    }
-    yahoo_8 = {
-        'PERSON': 'Equine',
-        'NORP': 'Japanese',
-        'FAC': 'Music',
-        'ORG': 'Congress',
-        'GPE': 'Chicago',
-        'LOC': 'Sea',
-        'PRODUCT': 'Variable',
-        'EVENT': 'Series',
-        'WORK_OF_ART': 'Stopping',
-        'LAW': 'Strap-',
-        'LANGUAGE': 'Spanish',
-        'DATE': '2004-05',
-        'TIME': 'night',
-        'PERCENT': '100%',
-        'QUANTITY': '$ale',
-        'ORDINAL': 'Sixth',
-        'CARDINAL': '2',
-    }
-    yahoo_9 = {
-        'PERSON': 'Equine',
-        'NORP': 'Chinese',
-        'FAC': 'Music',
-        'ORG': 'Digital',
-        'GPE': 'U.S.',
-        'LOC': 'Atlantic',
-        'PRODUCT': 'Variable',
-        'EVENT': 'Series',
-        'WORK_OF_ART': 'Weight',
-        'LAW': 'Constitution',
-        'LANGUAGE': 'Spanish',
-        'DATE': '1918-1945',
-        'TIME': 'night',
-        'PERCENT': '100%',
-        'MONEY': 'ten-dollar',
-        'QUANTITY': 'Hiberno-English',
-        'ORDINAL': 'Tertiary',
-        'CARDINAL': '5'
-    }
-    yahoo = [
-        yahoo_0, yahoo_1, yahoo_2, yahoo_3, yahoo_4, yahoo_5, yahoo_6, yahoo_7,
-        yahoo_8, yahoo_9
-    ]
-    L = {'IMDB': imdb, 'AGNEWS': agnews, 'YAHOO': yahoo}
+
+    L = {'IMDB': imdb, 'AGNEWS': agnews, 'SST2': sst2}
 
 
 NE_list = NameEntityList()

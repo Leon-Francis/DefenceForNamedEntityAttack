@@ -2,9 +2,9 @@ import __init__paths
 import attr
 import spacy
 from nltk.corpus import wordnet as wn
-from tools import str2seq, read_IMDB_text_data
-from config import config_device, config_pwws_use_NE, \
-    config_data, config_dataset, model_path, config_pww_NNE_attack
+from tools import str2seq, read_text_data
+from config import config_device, config_pwws_use_NE, attach_NE, \
+    config_data, config_dataset, model_path, config_pww_NNE_attack, BertConfig
 import numpy as np
 from get_NE_list import NE_list
 from functools import partial
@@ -415,15 +415,22 @@ def get_fool_sentence_pwws(sentence: str, label: int, index: int, net,
 
 if __name__ == '__main__':
     attempt_num = 100
+
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    datas, labels = read_IMDB_text_data(attempt_num)
+    datas, labels = read_text_data(
+        dataset_config[config_dataset].test_data_path, attempt_num)
     baseline_model = Baseline_Bert(
-        label_num=dataset_config[Baseline_Config.dataset].labels_num,
-        linear_layer_num=Baseline_Config.linear_layer_num,
-        dropout_rate=Baseline_Config.dropout_rate,
-        is_fine_tuning=Baseline_Config.is_fine_tuning).to(config_device)
-    baseline_model.load_state_dict(
-        torch.load(model_path['IMDB_Bert_attack_NE_weak'], map_location=config_device))
+        label_num=dataset_config[config_dataset].labels_num,
+        linear_layer_num=BertConfig.linear_layer_num[config_dataset],
+        dropout_rate=BertConfig.dropout_rate[config_dataset],
+        is_fine_tuning=BertConfig.is_fine_tuning[config_dataset]).to(config_device)
+
+    if attach_NE:
+        baseline_model.load_state_dict(
+            torch.load(model_path[f'{config_dataset}_Bert_attach_NE'], map_location=config_device))
+    else:
+        baseline_model.load_state_dict(
+            torch.load(model_path[f'{config_dataset}_Bert'], map_location=config_device))
 
     baseline_model.eval()
     success_num = 0

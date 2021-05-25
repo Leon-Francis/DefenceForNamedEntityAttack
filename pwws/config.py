@@ -2,7 +2,23 @@ import torch
 
 config_device_name = 'cuda:0'
 config_device = torch.device(config_device_name)
-config_dataset = 'IMDB'
+config_dataset = 'SST2'
+attach_NE = True
+
+
+class BertConfig():
+    linear_layer_num = {
+        'IMDB': 1,
+        'SST2': 1
+    }
+    dropout_rate = {
+        'IMDB': 0.5,
+        'SST2': 0.5
+    }
+    is_fine_tuning = {
+        'IMDB': True,
+        'SST2': True
+    }
 
 
 class TextCNNConfig():
@@ -56,73 +72,49 @@ class LSTMConfig():
 
 
 class IMDBConfig():
-    train_data_path = r'./dataset/IMDB/train_standard.txt'
-    test_data_path = r'./dataset/IMDB/test_standard.txt'
+    train_data_path = r'./dataset/IMDB/aclimdb/train.std'
+    test_data_path = r'./dataset/IMDB/aclimdb/test.std'
     pretrained_word_vectors_path = r'./static/glove.6B.100d.txt'
     labels_num = 2
     vocab_limit_size = 80000
     tokenizer_type = 'normal'
     remove_stop_words = False
     padding_maxlen = 230
-    clean_1k_path = r'./static/IMDB/clean1k.txt'
-    adv10_path = r'./dataset/IMDB/train_adv10.txt'
-    adv_train_path = {
-        'LSTM': r'./static/IMDB/LSTM_adv.txt',
-        'BidLSTM': r'./static/IMDB/BidLSTM_adv.txt',
-        'TextCNN': r'./static/IMDB/TextCNN_adv.txt',
-    }
-    syn_path = r'./static/IMDB/synonymous.csv'
 
 
 class AGNEWSConfig():
-    train_data_path = r'./dataset/AGNEWS/train_standard.txt'
-    test_data_path = r'./dataset/AGNEWS/test_standard.txt'
+    train_data_path = r'./dataset/AGNEWS/train.std'
+    test_data_path = r'./dataset/AGNEWS/test.std'
     pretrained_word_vectors_path = r'./static/glove.6B.100d.txt'
     labels_num = 4
     vocab_limit_size = 80000
     tokenizer_type = 'normal'
     remove_stop_words = False
     padding_maxlen = 50
-    clean_1k_path = r'./static/AGNEWS/clean1k.txt'
-    adv10_path = r'./dataset/AGNEWS/train_adv10.txt'
-    adv_train_path = {
-        'LSTM': r'./static/AGNEWS/LSTM_adv.txt',
-        'BidLSTM': r'./static/AGNEWS/BidLSTM_adv.txt',
-        'TextCNN': r'./static/AGNEWS/TextCNN_adv.txt',
-    }
-    syn_path = r'./static/AGNEWS/synonymous.csv'
 
 
-class YAHOOConfig():
-    train_data_path = r'./dataset/YAHOO/train150k_standard.txt'
-    test_data_path = r'./dataset/YAHOO/test5k_standard.txt'
+class SST2Config():
+    train_data_path = r'./dataset/SST2/train.std'
+    test_data_path = r'./dataset/SST2/test.std'
     pretrained_word_vectors_path = r'./static/glove.6B.100d.txt'
-    labels_num = 10
+    labels_num = 2
     vocab_limit_size = 80000
     tokenizer_type = 'normal'
     remove_stop_words = False
-    padding_maxlen = 100
-    clean_1k_path = r'./static/YAHOO/clean1k.txt'
-    adv10_path = r'./dataset/YAHOO/train_adv10.txt'
-    adv_train_path = {
-        'LSTM': r'./static/YAHOO/LSTM_adv.txt',
-        'BidLSTM': r'./static/YAHOO/BidLSTM_adv.txt',
-        'TextCNN': r'./static/YAHOO/TextCNN_adv.txt',
-    }
-    syn_path = r'./static/YAHOO/synonymous.csv'
+    padding_maxlen = 20
 
 
 config_data = {
     'IMDB': IMDBConfig,
     'AGNEWS': AGNEWSConfig,
-    'YAHOO': YAHOOConfig,
+    'SST2': SST2Config,
 }
 
 
 config_dataset_list = [
     'IMDB',
     'AGNEWS',
-    'YAHOO',
+    'SST2',
 ]
 
 
@@ -134,7 +126,9 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'IMDB_Bert_attach_NE': 'output/train_baseline_model/2021-05-14_21:39:33/models/IMDB_Bert_0.91680_05-15-04-01.pt',
               'IMDB_Bert_attach_NE_inhance': 'output/train_baseline_model/2021-05-18_19:47:01/models/IMDB_Bert_0.91008_05-19-05-14.pt',
               'IMDB_Bert_attack_NE_weak': 'output/train_baseline_model/2021-05-19_18:03:20/models/IMDB_Bert_0.91120_05-19-23-35.pt',
-              'IMDB_Bert': 'output/train_baseline_model/2021-05-11_21:36:13/models/IMDB_Bert_0.91564_05-11-22-58.pt'}
+              'IMDB_Bert': 'output/train_baseline_model/2021-05-11_21:36:13/models/IMDB_Bert_0.91564_05-11-22-58.pt',
+              'SST2_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_11:01:06/models/SST2_Bert_0.85592_05-25-11-08.pt',
+              'SST2_Bert': 'output/train_baseline_model/2021-05-24_22:50:17/models/SST2_Bert_0.87078_05-24-22-59.pt'}
 
 
 if __name__ == '__main__':
