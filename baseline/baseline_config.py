@@ -5,10 +5,10 @@ bert_vocab_size = 30522
 
 class Baseline_Config():
     output_dir = 'output'
-    cuda_idx = 1
+    cuda_idx = 0
     train_device = torch.device('cuda:' + str(cuda_idx))
     batch_size = 8
-    dataset = 'SST2'
+    dataset = 'AGNEWS'
     baseline = 'Bert'
     epoch = 30
     save_acc_limit = 0.85
@@ -20,7 +20,7 @@ class Baseline_Config():
 
     if_attach_NE = True
 
-    linear_layer_num = 1
+    linear_layer_num = 2
     dropout_rate = 0.5
     is_fine_tuning = True
 
@@ -68,4 +68,6 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'IMDB_Bert_attach_NE_inhance': 'output/train_baseline_model/2021-05-18_19:47:01/models/IMDB_Bert_0.91008_05-19-05-14.pt',
               'IMDB_Bert': 'output/train_baseline_model/2021-05-11_21:36:13/models/IMDB_Bert_0.91564_05-11-22-58.pt',
               'SST2_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_11:01:06/models/SST2_Bert_0.85592_05-25-11-08.pt',
-              'SST2_Bert': 'output/train_baseline_model/2021-05-24_22:50:17/models/SST2_Bert_0.87078_05-24-22-59.pt'}
+              'SST2_Bert': 'output/train_baseline_model/2021-05-24_22:50:17/models/SST2_Bert_0.87078_05-24-22-59.pt',
+              'AGNEWS_Bert': 'output/train_baseline_model/2021-05-25_12:16:00/models/AGNEWS_Bert_0.94250_05-25-14-51.pt',
+              'AGNEWS_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_17:30:41/models/AGNEWS_Bert_0.92803_05-26-05-35.pt'}
