@@ -64,7 +64,7 @@ class baseline_LSTM(nn.Module):
                  num_hiddens: int,
                  num_layers: int,
                  word_dim: int,
-                 vocab: 'Vocab',
+                 vocab,
                  labels_num: int,
                  using_pretrained=True,
                  bid=False,
@@ -106,7 +106,7 @@ class baseline_LSTM(nn.Module):
 
     def forward(self, X: torch.Tensor, types=None, masks=None):
         X = X.permute(1, 0)  # [batch, seq_len] -> [seq_len, batch]
-        X = self.embedding_layer(X)  #[seq_len, batch, word_dim]
+        X = self.embedding_layer(X)  # [seq_len, batch, word_dim]
 
         X = self.dropout(X)
 
@@ -123,7 +123,7 @@ class baseline_LSTM(nn.Module):
 
 
 class baseline_TextCNN(nn.Module):
-    def __init__(self, vocab: 'Vocab', train_embedding_word_dim, is_static,
+    def __init__(self, vocab, train_embedding_word_dim, is_static,
                  using_pretrained, num_channels: list, kernel_sizes: list,
                  labels_num: int, is_batch_normal: bool):
         super(baseline_TextCNN, self).__init__()
@@ -131,7 +131,8 @@ class baseline_TextCNN(nn.Module):
 
         self.using_pretrained = using_pretrained
         self.word_dim = train_embedding_word_dim
-        if using_pretrained: self.word_dim += vocab.word_dim
+        if using_pretrained:
+            self.word_dim += vocab.word_dim
 
         if using_pretrained:
             self.embedding_pre = nn.Embedding(vocab.num, vocab.word_dim)
@@ -180,7 +181,7 @@ class baseline_TextCNN(nn.Module):
             self.pool(F.relu(conv(embeddings))).squeeze(-1)
             for conv in self.convs
         ],
-                         dim=1)
+            dim=1)
 
         outs = self.dropout(outs)
 

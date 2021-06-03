@@ -2,10 +2,13 @@ from transformers import BertTokenizer
 import spacy
 import torch
 from torch.utils.data import Dataset
-from baseline_tools import logging
-from baseline_config import IMDBConfig, SST2Config, AGNEWSConfig
+from baseline_tools import logging, load_pkl_obj, save_pkl_obj
+from baseline_config import Baseline_Config, IMDBConfig, SST2Config, AGNEWSConfig
 from random import choice
 import json
+import re
+import numpy as np
+import os
 nlp = spacy.load('en_core_web_sm')
 
 
@@ -58,6 +61,10 @@ class IMDB_Dataset(Dataset):
         f_1.close()
         self.imdb_attach_NE = [imdb_0, imdb_1]
         self.data2tokens(if_mask_NE, if_replace_NE, if_attach_NE)
+        if Baseline_Config.baseline == 'Bert':
+            self.vocab = None
+        else:
+            self.vocab = Baseline_Vocab(self.data_tokens)
         self.token2idx()
         self.transfor()
 
@@ -151,8 +158,14 @@ class IMDB_Dataset(Dataset):
 
     def token2idx(self):
         logging(f'{self.path} in token2idx')
-        for tokens in self.data_tokens:
-            self.data_idx.append(self.tokenizer.convert_tokens_to_ids(tokens))
+        if not self.vocab:
+            for tokens in self.data_tokens:
+                self.data_idx.append(
+                    self.tokenizer.convert_tokens_to_ids(tokens))
+        else:
+            for tokens in self.data_tokens:
+                self.data_idx.append(
+                    [self.vocab.get_index(token) for token in tokens])
 
         for i in range(len(self.data_idx)):
             if len(self.data_idx[i]) < self.sen_len:
@@ -401,6 +414,137 @@ class AGNEWS_Dataset(Dataset):
 
     def __len__(self):
         return len(self.data_idx)
+
+
+class Baseline_Vocab():
+
+    def __init__(self, origin_data_tokens, vocab_limit_size=50000, is_special=False,
+                 is_using_pretrained=True, word_vec_file_path=r'./static/glove.6B.100d.txt'):
+        assert len(origin_data_tokens) > 0
+        self.file_path = word_vec_file_path
+        self.word_dim = int(re.findall("\d+d", word_vec_file_path)[0][:-1])
+        self.word_dict = {}
+        self.word_count = {}
+        self.vectors = None
+        self.num = 0
+        self.data_tokens = []
+        self.words_vocab = []
+        self.is_special = is_special  # enable <cls> and <sep>
+        self.special_word_pad = ('[PAD]', 0)
+        self.special_word_unk = ('[UNK]', 1)
+        self.special_word_cls = ('[CLS]', 2)
+        self.special_word_sep = ('[SEP]', 3)
+        self.data_tokens = origin_data_tokens
+        self.__build_words_index()
+        self.__limit_dict_size(vocab_limit_size)
+        if is_using_pretrained:
+            logging(f'building word vectors from {self.file_path}')
+            self.__read_pretrained_word_vecs()
+        logging(f'word vectors has been built! dict size is {self.num}')
+
+    def __build_words_index(self):
+        for sen in self.data_tokens:
+            for word in sen:
+                if word not in self.word_dict:
+                    self.word_dict[word] = self.num
+                    self.word_count[word] = 1
+                    self.num += 1
+                else:
+                    self.word_count[word] += 1
+
+    def __limit_dict_size(self, vocab_limit_size):
+        limit = vocab_limit_size
+        word_count_temp = sorted(
+            self.word_count.items(), key=lambda x: x[1], reverse=True)
+        count = 2
+        self.words_vocab.append(self.special_word_pad[0])
+        self.words_vocab.append(self.special_word_unk[0])
+        self.word_count[self.special_word_pad[0]] = int(1e9)
+        self.word_count[self.special_word_unk[0]] = int(1e9)
+        if self.is_special:
+            self.words_vocab += [self.special_word_cls[0],
+                                 self.special_word_sep[0]]
+            self.word_count[self.special_word_cls[0]] = int(1e9)
+            self.word_count[self.special_word_sep[0]] = int(1e9)
+            count += 2
+        temp = {}
+        for x, y in word_count_temp:
+            if count > limit:
+                break
+            temp[x] = count
+            self.words_vocab.append(x)
+            count += 1
+        self.word_dict = temp
+        self.word_dict[self.special_word_pad[0]] = 0
+        self.word_dict[self.special_word_unk[0]] = 1
+        if self.is_special:
+            self.word_dict[self.special_word_cls[0]] = 2
+            self.word_dict[self.special_word_sep[0]] = 3
+        self.num = count
+        assert self.num == len(self.word_dict) == len(self.words_vocab)
+        self.vectors = np.ndarray([self.num, self.word_dim], dtype='float32')
+
+    def __read_pretrained_word_vecs(self):
+        num = 2
+        word_dict = {}
+        word_dict[self.special_word_pad[0]] = 0
+        word_dict[self.special_word_unk[0]] = 1  # unknown word
+
+        temp = self.file_path + '.pkl'
+        if os.path.exists(temp):
+            word_dict, vectors = load_pkl_obj(temp)
+        else:
+            if self.is_special:
+                word_dict[self.special_word_cls[0]] = 2
+                word_dict[self.special_word_sep[0]] = 3
+                num += 2
+            with open(self.file_path, 'r', encoding='utf-8') as file:
+                file = file.readlines()
+                vectors = np.ndarray(
+                    [len(file) + num, self.word_dim], dtype='float32')
+                vectors[0] = np.random.normal(0.0, 0.3, [self.word_dim])  # pad
+                vectors[1] = np.random.normal(0.0, 0.3, [self.word_dim])  # unk
+                if self.is_special:
+                    vectors[2] = np.random.normal(0.0, 0.3, [self.word_dim])
+                    vectors[3] = np.random.normal(0.0, 0.3, [self.word_dim])
+                for line in file:
+                    line = line.split()
+                    word_dict[line[0]] = num
+                    vectors[num] = np.asarray(
+                        line[-self.word_dim:], dtype='float32')
+                    num += 1
+
+            save_pkl_obj((word_dict, vectors), temp)
+
+        for word, idx in self.word_dict.items():
+            if word in word_dict:
+                key = word_dict[word]
+                self.vectors[idx] = vectors[key]
+            else:
+                self.vectors[idx] = vectors[1]
+
+    def __len__(self):
+        return self.num
+
+    def get_word_count(self, word):
+        # word could be int or str
+        if isinstance(word, int):
+            word = self.get_word(word)
+        if word not in self.word_count:
+            return 0  # OOV
+        return self.word_count[word]
+
+    def get_index(self, word: str):
+        if word not in self.word_dict:
+            return 1  # unknown word
+        return self.word_dict[word]
+
+    def get_word(self, index: int):
+        return self.words_vocab[index]
+
+    def get_vec(self, index: int):
+        assert self.vectors is not None
+        return self.vectors[index]
 
 
 if __name__ == '__main__':
