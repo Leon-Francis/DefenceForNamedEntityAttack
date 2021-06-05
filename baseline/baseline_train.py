@@ -2,7 +2,7 @@ from baseline_data import IMDB_Dataset, SST2_Dataset, AGNEWS_Dataset
 import torch
 from torch.utils.data import DataLoader
 from torch import nn, optim
-from baseline_model import Baseline_Bert
+from baseline_model import Baseline_Bert, Baseline_LSTM, Baseline_TextCNN
 from baseline_tools import logging, get_time
 from baseline_config import Baseline_Config, config_path, dataset_config
 from datetime import datetime
@@ -15,7 +15,7 @@ def save_config(path):
     copyfile(config_path, path + r'/config.txt')
 
 
-def build_dataset():
+def build_bert_dataset():
     if Baseline_Config.dataset == 'IMDB':
         train_dataset_orig = IMDB_Dataset(train_data=True,
                                           if_mask_NE=Baseline_Config.if_mask_NE,
@@ -50,6 +50,30 @@ def build_dataset():
                            shuffle=False,
                            num_workers=4)
     return train_data, test_data
+
+
+def build_dataset():
+    train_dataset_orig = IMDB_Dataset(train_data=True,
+                                      if_mask_NE=Baseline_Config.if_mask_NE,
+                                      if_replace_NE=Baseline_Config.if_replace_NE,
+                                      if_attach_NE=Baseline_Config.if_attach_NE,
+                                      debug_mode=Baseline_Config.debug_mode)
+
+    test_dataset_orig = IMDB_Dataset(train_data=False,
+                                     vocab=train_dataset_orig.vocab,
+                                     if_mask_NE=Baseline_Config.if_mask_NE,
+                                     if_replace_NE=Baseline_Config.if_replace_NE,
+                                     if_attach_NE=Baseline_Config.if_attach_NE,
+                                     debug_mode=Baseline_Config.debug_mode)
+    train_data = DataLoader(train_dataset_orig,
+                            batch_size=Baseline_Config.batch_size,
+                            shuffle=True,
+                            num_workers=4)
+    test_data = DataLoader(test_dataset_orig,
+                           batch_size=Baseline_Config.batch_size,
+                           shuffle=False,
+                           num_workers=4)
+    return train_data, test_data, train_dataset_orig.vocab
 
 
 def train(train_data, baseline_model, criterion, optimizer):
@@ -100,26 +124,78 @@ if __name__ == '__main__':
     save_config(cur_dir)
 
     logging('preparing data...')
-    train_data, test_data = build_dataset()
+    if Baseline_Config.baseline == 'Bert':
+        train_data, test_data = build_bert_dataset()
 
-    logging('init models, optimizer, criterion...')
-    baseline_model = Baseline_Bert(
-        label_num=dataset_config[Baseline_Config.dataset].labels_num,
-        linear_layer_num=Baseline_Config.linear_layer_num,
-        dropout_rate=Baseline_Config.dropout_rate,
-        is_fine_tuning=Baseline_Config.is_fine_tuning).to(
+        logging('init models, optimizer, criterion...')
+        baseline_model = Baseline_Bert(
+            label_num=dataset_config[Baseline_Config.dataset].labels_num,
+            linear_layer_num=Baseline_Config.linear_layer_num,
+            dropout_rate=Baseline_Config.dropout_rate,
+            is_fine_tuning=Baseline_Config.is_fine_tuning).to(
+                Baseline_Config.train_device)
+
+        optimizer = optim.AdamW([{
+            'params': baseline_model.bert_model.parameters(),
+            'lr': Baseline_Config.Bert_lr
+        }, {
+            'params': baseline_model.fc.parameters()
+        }],
+            lr=Baseline_Config.lr,
+            betas=(0.9, 0.999),
+            eps=1e-08,
+            weight_decay=1e-3)
+
+    elif Baseline_Config.baseline == 'BidLSTM':
+        train_data, test_data, vocab = build_dataset()
+
+        logging('init models, optimizer, criterion...')
+        baseline_model = Baseline_LSTM(num_hiddens=128,
+                                       num_layers=2,
+                                       word_dim=50,
+                                       vocab=vocab,
+                                       labels_num=2,
+                                       using_pretrained=False,
+                                       bid=True,
+                                       head_tail=False).to(
             Baseline_Config.train_device)
 
-    optimizer = optim.AdamW([{
-        'params': baseline_model.bert_model.parameters(),
-        'lr': Baseline_Config.Bert_lr
-    }, {
-        'params': baseline_model.fc.parameters()
-    }],
-        lr=Baseline_Config.lr,
-        betas=(0.9, 0.999),
-        eps=1e-08,
-        weight_decay=1e-3)
+        optimizer = optim.AdamW(baseline_model.parameters(
+        ), lr=Baseline_Config.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=1e-3)
+
+    elif Baseline_Config.baseline == 'LSTM':
+        train_data, test_data, vocab = build_dataset()
+
+        logging('init models, optimizer, criterion...')
+        baseline_model = Baseline_LSTM(num_hiddens=128,
+                                       num_layers=2,
+                                       word_dim=50,
+                                       vocab=vocab,
+                                       labels_num=2,
+                                       using_pretrained=False,
+                                       bid=False,
+                                       head_tail=False).to(
+            Baseline_Config.train_device)
+
+        optimizer = optim.AdamW(baseline_model.parameters(
+        ), lr=Baseline_Config.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=1e-3)
+
+    elif Baseline_Config.baseline == 'TextCNN':
+        train_data, test_data, vocab = build_dataset()
+
+        logging('init models, optimizer, criterion...')
+        baseline_model = Baseline_TextCNN(vocab=vocab,
+                                          train_embedding_word_dim=50,
+                                          is_static=True,
+                                          using_pretrained=True,
+                                          num_channels=[50, 50, 50],
+                                          kernel_sizes=[3, 4, 5],
+                                          labels_num=2,
+                                          is_batch_normal=True).to(
+            Baseline_Config.train_device)
+
+        optimizer = optim.AdamW(baseline_model.parameters(
+        ), lr=Baseline_Config.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=1e-3)
 
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer,
                                                      mode='min',

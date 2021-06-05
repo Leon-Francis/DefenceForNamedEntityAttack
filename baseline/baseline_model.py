@@ -59,7 +59,7 @@ class Baseline_Bert(nn.Module):
         return predicts
 
 
-class baseline_LSTM(nn.Module):
+class Baseline_LSTM(nn.Module):
     def __init__(self,
                  num_hiddens: int,
                  num_layers: int,
@@ -69,7 +69,7 @@ class baseline_LSTM(nn.Module):
                  using_pretrained=True,
                  bid=False,
                  head_tail=False):
-        super(baseline_LSTM, self).__init__()
+        super(Baseline_LSTM, self).__init__()
         if bid:
             self.model_name = 'BidLSTM'
         else:
@@ -122,11 +122,11 @@ class baseline_LSTM(nn.Module):
         return outputs
 
 
-class baseline_TextCNN(nn.Module):
+class Baseline_TextCNN(nn.Module):
     def __init__(self, vocab, train_embedding_word_dim, is_static,
                  using_pretrained, num_channels: list, kernel_sizes: list,
                  labels_num: int, is_batch_normal: bool):
-        super(baseline_TextCNN, self).__init__()
+        super(Baseline_TextCNN, self).__init__()
         self.model_name = 'TextCNN'
 
         self.using_pretrained = using_pretrained

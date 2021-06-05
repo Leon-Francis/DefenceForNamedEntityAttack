@@ -5,11 +5,11 @@ bert_vocab_size = 30522
 
 class Baseline_Config():
     output_dir = 'output'
-    cuda_idx = 0
+    cuda_idx = 1
     train_device = torch.device('cuda:' + str(cuda_idx))
     batch_size = 8
-    dataset = 'AGNEWS'
-    baseline = 'Bert'
+    dataset = 'IMDB'
+    baseline = 'BidLSTM'
     epoch = 30
     save_acc_limit = 0.85
 
@@ -18,7 +18,7 @@ class Baseline_Config():
     if_mask_NE = False
     if_replace_NE = False
 
-    if_attach_NE = True
+    if_attach_NE = False
 
     linear_layer_num = 2
     dropout_rate = 0.5

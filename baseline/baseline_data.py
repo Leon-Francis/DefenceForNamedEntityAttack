@@ -15,6 +15,7 @@ nlp = spacy.load('en_core_web_sm')
 class IMDB_Dataset(Dataset):
     def __init__(self,
                  train_data=True,
+                 vocab=None,
                  if_mask_NE=False,
                  if_replace_NE=False,
                  if_attach_NE=False,
@@ -64,7 +65,10 @@ class IMDB_Dataset(Dataset):
         if Baseline_Config.baseline == 'Bert':
             self.vocab = None
         else:
-            self.vocab = Baseline_Vocab(self.data_tokens)
+            if not vocab:
+                self.vocab = Baseline_Vocab(self.data_tokens)
+            else:
+                self.vocab = vocab
         self.token2idx()
         self.transfor()
 
