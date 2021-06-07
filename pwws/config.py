@@ -2,8 +2,8 @@ import torch
 
 config_device_name = 'cuda:1'
 config_device = torch.device(config_device_name)
-config_dataset = 'AGNEWS'
-attach_NE = True
+config_dataset = 'IMDB'
+attach_NE = False
 
 
 class BertConfig():
