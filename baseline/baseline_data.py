@@ -33,6 +33,7 @@ class IMDB_Dataset(Dataset):
         else:
             self.tokenizer = Baseline_Tokenizer()
         self.sen_len = IMDBConfig.sen_len
+        self.ori_data_tokens = []
         self.data_tokens = []
         self.data_idx = []
         self.replace_dict = {
@@ -69,7 +70,7 @@ class IMDB_Dataset(Dataset):
             self.vocab = None
         else:
             if not vocab:
-                self.vocab = Baseline_Vocab(self.data_tokens)
+                self.vocab = Baseline_Vocab(self.ori_data_tokens)
             else:
                 self.vocab = vocab
         self.token2idx()
@@ -135,6 +136,7 @@ class IMDB_Dataset(Dataset):
             NE_nums = 0
             for sen_idx, sen in enumerate(self.datas):
                 tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
+                self.ori_data_tokens.append(tokens)
                 self.data_tokens.append(tokens)
                 temp_label_list.append(self.classification_label[sen_idx])
                 doc = nlp(sen)
