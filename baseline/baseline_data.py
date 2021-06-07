@@ -28,7 +28,10 @@ class IMDB_Dataset(Dataset):
             self.path = IMDBConfig.test_data_path
         self.datas, self.classification_label = self.read_standard_data(
             self.path, debug_mode)
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        if Baseline_Config.baseline == 'Bert':
+            self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        else:
+            self.tokenizer = Baseline_Tokenizer()
         self.sen_len = IMDBConfig.sen_len
         self.data_tokens = []
         self.data_idx = []
@@ -188,10 +191,7 @@ class IMDB_Dataset(Dataset):
 
 
 class SST2_Dataset(Dataset):
-    def __init__(self,
-                 train_data=True,
-                 if_attach_NE=False,
-                 debug_mode=False):
+    def __init__(self, train_data=True, if_attach_NE=False, debug_mode=False):
         super(SST2_Dataset, self).__init__()
         self.train_model = train_data
         if train_data:
@@ -300,10 +300,7 @@ class SST2_Dataset(Dataset):
 
 
 class AGNEWS_Dataset(Dataset):
-    def __init__(self,
-                 train_data=True,
-                 if_attach_NE=False,
-                 debug_mode=False):
+    def __init__(self, train_data=True, if_attach_NE=False, debug_mode=False):
         super(AGNEWS_Dataset, self).__init__()
         self.train_model = train_data
         if train_data:
@@ -421,9 +418,12 @@ class AGNEWS_Dataset(Dataset):
 
 
 class Baseline_Vocab():
-
-    def __init__(self, origin_data_tokens, vocab_limit_size=50000, is_special=False,
-                 is_using_pretrained=True, word_vec_file_path=r'./static/glove.6B.100d.txt'):
+    def __init__(self,
+                 origin_data_tokens,
+                 vocab_limit_size=80000,
+                 is_special=False,
+                 is_using_pretrained=True,
+                 word_vec_file_path=r'./static/glove.6B.100d.txt'):
         assert len(origin_data_tokens) > 0
         self.file_path = word_vec_file_path
         self.word_dim = int(re.findall("\d+d", word_vec_file_path)[0][:-1])
@@ -458,16 +458,18 @@ class Baseline_Vocab():
 
     def __limit_dict_size(self, vocab_limit_size):
         limit = vocab_limit_size
-        word_count_temp = sorted(
-            self.word_count.items(), key=lambda x: x[1], reverse=True)
+        word_count_temp = sorted(self.word_count.items(),
+                                 key=lambda x: x[1],
+                                 reverse=True)
         count = 2
         self.words_vocab.append(self.special_word_pad[0])
         self.words_vocab.append(self.special_word_unk[0])
         self.word_count[self.special_word_pad[0]] = int(1e9)
         self.word_count[self.special_word_unk[0]] = int(1e9)
         if self.is_special:
-            self.words_vocab += [self.special_word_cls[0],
-                                 self.special_word_sep[0]]
+            self.words_vocab += [
+                self.special_word_cls[0], self.special_word_sep[0]
+            ]
             self.word_count[self.special_word_cls[0]] = int(1e9)
             self.word_count[self.special_word_sep[0]] = int(1e9)
             count += 2
@@ -504,8 +506,8 @@ class Baseline_Vocab():
                 num += 2
             with open(self.file_path, 'r', encoding='utf-8') as file:
                 file = file.readlines()
-                vectors = np.ndarray(
-                    [len(file) + num, self.word_dim], dtype='float32')
+                vectors = np.ndarray([len(file) + num, self.word_dim],
+                                     dtype='float32')
                 vectors[0] = np.random.normal(0.0, 0.3, [self.word_dim])  # pad
                 vectors[1] = np.random.normal(0.0, 0.3, [self.word_dim])  # unk
                 if self.is_special:
@@ -514,8 +516,8 @@ class Baseline_Vocab():
                 for line in file:
                     line = line.split()
                     word_dict[line[0]] = num
-                    vectors[num] = np.asarray(
-                        line[-self.word_dim:], dtype='float32')
+                    vectors[num] = np.asarray(line[-self.word_dim:],
+                                              dtype='float32')
                     num += 1
 
             save_pkl_obj((word_dict, vectors), temp)
@@ -549,6 +551,27 @@ class Baseline_Vocab():
     def get_vec(self, index: int):
         assert self.vectors is not None
         return self.vectors[index]
+
+
+class Baseline_Tokenizer():
+    def __init__(self):
+        pass
+
+    def pre_process(self, text: str) -> str:
+        text = text.lower().strip()
+        text = re.sub(r"<br />", "", text)
+        text = re.sub(r'(\W)(?=\1)', '', text)
+        text = re.sub(r"([.!?,])", r" \1", text)
+        text = re.sub(r"[^a-zA-Z.!?]+", r" ", text)
+        return text.strip()
+
+    def normal_token(self, text: str):
+        return [tok for tok in text.split() if not tok.isspace()]
+
+    def tokenize(self, text: str):
+        text = self.pre_process(text)
+        words = self.normal_token(text)
+        return words
 
 
 if __name__ == '__main__':

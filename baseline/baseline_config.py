@@ -5,13 +5,13 @@ bert_vocab_size = 30522
 
 class Baseline_Config():
     output_dir = 'output'
-    cuda_idx = 1
+    cuda_idx = 0
     train_device = torch.device('cuda:' + str(cuda_idx))
-    batch_size = 8
+    batch_size = 16
     dataset = 'IMDB'
-    baseline = 'BidLSTM'
-    epoch = 30
-    save_acc_limit = 0.85
+    baseline = 'LSTM'
+    epoch = 80
+    save_acc_limit = 0.80
 
     debug_mode = False
 
@@ -25,7 +25,7 @@ class Baseline_Config():
     is_fine_tuning = True
 
     Bert_lr = 1e-5
-    lr = 1e-4
+    lr = 9e-4
     skip_loss = 0.16
 
 
@@ -70,4 +70,6 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'SST2_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_11:01:06/models/SST2_Bert_0.85592_05-25-11-08.pt',
               'SST2_Bert': 'output/train_baseline_model/2021-05-24_22:50:17/models/SST2_Bert_0.87078_05-24-22-59.pt',
               'AGNEWS_Bert': 'output/train_baseline_model/2021-05-25_12:16:00/models/AGNEWS_Bert_0.94250_05-25-14-51.pt',
-              'AGNEWS_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_17:30:41/models/AGNEWS_Bert_0.92803_05-26-05-35.pt'}
+              'AGNEWS_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_17:30:41/models/AGNEWS_Bert_0.92803_05-26-05-35.pt',
+              'IMDB_LSTM': 'output/train_baseline_model/2021-06-06_20:05:19/models/IMDB_LSTM_0.84240_06-06-20-22.pt',
+              'IMDB_LSTM_attach_NE': 'output/train_baseline_model/2021-06-06_21:12:45/models/IMDB_LSTM_0.82920_06-07-01-08.pt'}

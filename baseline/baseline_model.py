@@ -121,6 +121,28 @@ class Baseline_LSTM(nn.Module):
 
         return outputs
 
+    def predict_prob(self, X: torch.Tensor, y_true: torch.Tensor):
+        if X.dim() == 1:
+            X = X.view(1, -1)
+        if y_true.dim() == 0:
+            y_true = y_true.view(1)
+
+        with torch.no_grad():
+            logits = self.forward(X)
+            logits = F.softmax(logits, dim=1)
+            prob = [logits[i][y_true[i]].item() for i in range(y_true.size(0))]
+            return prob
+
+    def predict_class(self, X: torch.Tensor):
+        if X.dim() == 1:
+            X = X.view(1, -1)
+        predicts = None
+        with torch.no_grad():
+            logits = self.forward(X)
+            logits = F.softmax(logits, dim=1)
+            predicts = [one.argmax(0).item() for one in logits]
+        return predicts
+
 
 class Baseline_TextCNN(nn.Module):
     def __init__(self, vocab, train_embedding_word_dim, is_static,
@@ -187,3 +209,25 @@ class Baseline_TextCNN(nn.Module):
 
         logits = self.fc(outs)
         return logits
+
+    def predict_prob(self, X: torch.Tensor, y_true: torch.Tensor):
+        if X.dim() == 1:
+            X = X.view(1, -1)
+        if y_true.dim() == 0:
+            y_true = y_true.view(1)
+
+        with torch.no_grad():
+            logits = self.forward(X)
+            logits = F.softmax(logits, dim=1)
+            prob = [logits[i][y_true[i]].item() for i in range(y_true.size(0))]
+            return prob
+
+    def predict_class(self, X: torch.Tensor):
+        if X.dim() == 1:
+            X = X.view(1, -1)
+        predicts = None
+        with torch.no_grad():
+            logits = self.forward(X)
+            logits = F.softmax(logits, dim=1)
+            predicts = [one.argmax(0).item() for one in logits]
+        return predicts

@@ -1,3 +1,3 @@
 currTime=$(date +"%Y-%m-%d_%T")
 
-nohup python ./baseline/baseline_train.py > ./baseline/logs/IMDB_BidLSTM_baseline_${currTime}_1.log 2>&1 &
+nohup python ./baseline/baseline_train.py > ./baseline/logs/IMDB_LSTM_${currTime}_0.log 2>&1 &

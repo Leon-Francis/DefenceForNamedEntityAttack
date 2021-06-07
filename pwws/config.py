@@ -133,7 +133,9 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'SST2_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_11:01:06/models/SST2_Bert_0.85592_05-25-11-08.pt',
               'SST2_Bert': 'output/train_baseline_model/2021-05-24_22:50:17/models/SST2_Bert_0.87078_05-24-22-59.pt',
               'AGNEWS_Bert': 'output/train_baseline_model/2021-05-25_12:16:00/models/AGNEWS_Bert_0.94250_05-25-14-51.pt',
-              'AGNEWS_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_17:30:41/models/AGNEWS_Bert_0.92803_05-26-05-35.pt'}
+              'AGNEWS_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_17:30:41/models/AGNEWS_Bert_0.92803_05-26-05-35.pt',
+              'IMDB_LSTM': 'output/train_baseline_model/2021-06-06_20:05:19/models/IMDB_LSTM_0.84240_06-06-20-22.pt',
+              'IMDB_LSTM_attach_NE': 'output/train_baseline_model/2021-06-06_21:12:45/models/IMDB_LSTM_0.82920_06-07-01-08.pt'}
 
 
 if __name__ == '__main__':
