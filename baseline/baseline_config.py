@@ -5,11 +5,11 @@ bert_vocab_size = 30522
 
 class Baseline_Config():
     output_dir = 'output'
-    cuda_idx = 0
+    cuda_idx = 1
     train_device = torch.device('cuda:' + str(cuda_idx))
     batch_size = 16
     dataset = 'IMDB'
-    baseline = 'LSTM'
+    baseline = 'TextCNN'
     epoch = 80
     save_acc_limit = 0.80
 
@@ -71,5 +71,5 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'SST2_Bert': 'output/train_baseline_model/2021-05-24_22:50:17/models/SST2_Bert_0.87078_05-24-22-59.pt',
               'AGNEWS_Bert': 'output/train_baseline_model/2021-05-25_12:16:00/models/AGNEWS_Bert_0.94250_05-25-14-51.pt',
               'AGNEWS_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_17:30:41/models/AGNEWS_Bert_0.92803_05-26-05-35.pt',
-              'IMDB_LSTM': 'output/train_baseline_model/2021-06-06_20:05:19/models/IMDB_LSTM_0.84240_06-06-20-22.pt',
-              'IMDB_LSTM_attach_NE': 'output/train_baseline_model/2021-06-06_21:12:45/models/IMDB_LSTM_0.82920_06-07-01-08.pt'}
+              'IMDB_LSTM': 'output/train_baseline_model/2021-06-07_16:58:01/models/IMDB_LSTM_0.84500_06-07-17-13.pt',
+              'IMDB_LSTM_attach_NE': 'output/train_baseline_model/2021-06-07_21:28:52/models/IMDB_LSTM_0.82864_06-08-00-51.pt'}

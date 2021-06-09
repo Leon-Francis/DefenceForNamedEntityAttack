@@ -164,6 +164,7 @@ class IMDB_Dataset(Dataset):
             for sen in self.datas:
                 tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
                 self.data_tokens.append(tokens)
+                self.ori_data_tokens.append(tokens)
 
     def token2idx(self):
         logging(f'{self.path} in token2idx')
