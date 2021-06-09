@@ -38,7 +38,7 @@ def parse_bool(x):
     return None
 
 
-def read_text_data(config_dataset_path, attempt_num):
+def read_text_test_data(config_dataset_path, attempt_num):
     datas = []
     labels = []
     with open(config_dataset_path, 'r',
@@ -54,6 +54,19 @@ def read_text_data(config_dataset_path, attempt_num):
     random.shuffle(labels)
     datas = datas[:attempt_num]
     labels = labels[:attempt_num]
+    logging(f'loading data {len(datas)}')
+    return datas, labels
+
+
+def read_text_train_data(config_dataset_path):
+    datas = []
+    labels = []
+    with open(config_dataset_path, 'r',
+              encoding='utf-8') as file:
+        for line in file:
+            line = line.strip('\n')
+            datas.append(line[:-1])
+            labels.append(int(line[-1]))
     logging(f'loading data {len(datas)}')
     return datas, labels
 

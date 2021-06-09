@@ -4,12 +4,15 @@ import torch
 from torch.utils.data import Dataset
 from baseline_tools import logging, load_pkl_obj, save_pkl_obj
 from baseline_config import Baseline_Config, IMDBConfig, SST2Config, AGNEWSConfig
+import random
 from random import choice
 import json
 import re
 import numpy as np
 import os
 nlp = spacy.load('en_core_web_sm')
+
+random.seed(667)
 
 
 class IMDB_Dataset(Dataset):
@@ -33,7 +36,6 @@ class IMDB_Dataset(Dataset):
         else:
             self.tokenizer = Baseline_Tokenizer()
         self.sen_len = IMDBConfig.sen_len
-        self.ori_data_tokens = []
         self.data_tokens = []
         self.data_idx = []
         self.replace_dict = {
@@ -70,7 +72,7 @@ class IMDB_Dataset(Dataset):
             self.vocab = None
         else:
             if not vocab:
-                self.vocab = Baseline_Vocab(self.ori_data_tokens)
+                self.vocab = Baseline_Vocab(self.data_tokens)
             else:
                 self.vocab = vocab
         self.token2idx()
@@ -136,7 +138,6 @@ class IMDB_Dataset(Dataset):
             NE_nums = 0
             for sen_idx, sen in enumerate(self.datas):
                 tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
-                self.ori_data_tokens.append(tokens)
                 self.data_tokens.append(tokens)
                 temp_label_list.append(self.classification_label[sen_idx])
                 doc = nlp(sen)
@@ -164,7 +165,6 @@ class IMDB_Dataset(Dataset):
             for sen in self.datas:
                 tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
                 self.data_tokens.append(tokens)
-                self.ori_data_tokens.append(tokens)
 
     def token2idx(self):
         logging(f'{self.path} in token2idx')

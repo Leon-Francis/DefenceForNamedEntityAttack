@@ -9,7 +9,7 @@ class Baseline_Config():
     train_device = torch.device('cuda:' + str(cuda_idx))
     batch_size = 16
     dataset = 'IMDB'
-    baseline = 'TextCNN'
+    baseline = 'LSTM'
     epoch = 80
     save_acc_limit = 0.80
 

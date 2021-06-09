@@ -2,7 +2,7 @@ import __init__paths
 import attr
 import spacy
 from nltk.corpus import wordnet as wn
-from tools import str2seq, read_text_data
+from tools import str2seq, read_text_train_data, read_text_test_data
 from config import config_device, config_pwws_use_NE, attach_NE, \
     config_data, config_dataset, model_path, config_pww_NNE_attack, BertConfig
 import numpy as np
@@ -432,62 +432,23 @@ class BaselineTokenizer():
 
 
 if __name__ == '__main__':
-    # attempt_num = 100
-
-    # tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    # datas, labels = read_text_data(
-    #     dataset_config[config_dataset].test_data_path, attempt_num)
-    # baseline_model = Baseline_Bert(
-    #     label_num=dataset_config[config_dataset].labels_num,
-    #     linear_layer_num=BertConfig.linear_layer_num[config_dataset],
-    #     dropout_rate=BertConfig.dropout_rate[config_dataset],
-    #     is_fine_tuning=BertConfig.is_fine_tuning[config_dataset]).to(config_device)
-
-    # if attach_NE:
-    #     baseline_model.load_state_dict(
-    #         torch.load(model_path[f'{config_dataset}_Bert_attach_NE'], map_location=config_device))
-    # else:
-    #     baseline_model.load_state_dict(
-    #         torch.load(model_path[f'{config_dataset}_Bert'], map_location=config_device))
-
-    # baseline_model.eval()
-    # success_num = 0
-    # try_all = 0
-    # attack_time = 0
-    # for idx, data in enumerate(datas):
-    #     adv_s, flag, end = get_fool_sentence_pwws(data, labels[idx], idx,
-    #                                               baseline_model, tokenizer,
-    #                                               True, None)
-    #     attack_time += end
-    #     if flag == 1:
-    #         success_num += 1
-    #         try_all += 1
-    #     elif flag == 0:
-    #         try_all += 1
-    # print(f'attempt_num:{attempt_num}')
-    # print(f'attack_num:{try_all}')
-    # print(f'attack_acc:{success_num / try_all}')
-    # print(f'attack_time:{attack_time}')
     attempt_num = 100
 
-    tokenizer = BaselineTokenizer()
-    datas, labels = read_text_data(
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    datas, labels = read_text_test_data(
         dataset_config[config_dataset].test_data_path, attempt_num)
-    baseline_model = Baseline_LSTM(num_hiddens=128,
-                                   num_layers=2,
-                                   word_dim=50,
-                                   vocab=tokenizer.vocab,
-                                   labels_num=2,
-                                   using_pretrained=False,
-                                   bid=False,
-                                   head_tail=False).to(config_device)
+    baseline_model = Baseline_Bert(
+        label_num=dataset_config[config_dataset].labels_num,
+        linear_layer_num=BertConfig.linear_layer_num[config_dataset],
+        dropout_rate=BertConfig.dropout_rate[config_dataset],
+        is_fine_tuning=BertConfig.is_fine_tuning[config_dataset]).to(config_device)
 
     if attach_NE:
         baseline_model.load_state_dict(
-            torch.load(model_path[f'IMDB_LSTM_attach_NE'], map_location=config_device))
+            torch.load(model_path[f'{config_dataset}_Bert_attach_NE'], map_location=config_device))
     else:
         baseline_model.load_state_dict(
-            torch.load(model_path[f'IMDB_LSTM'], map_location=config_device))
+            torch.load(model_path[f'{config_dataset}_Bert'], map_location=config_device))
 
     baseline_model.eval()
     success_num = 0
@@ -507,3 +468,42 @@ if __name__ == '__main__':
     print(f'attack_num:{try_all}')
     print(f'attack_acc:{success_num / try_all}')
     print(f'attack_time:{attack_time}')
+    # attempt_num = 100
+
+    # tokenizer = BaselineTokenizer()
+    # datas, labels = read_text_data(
+    #     dataset_config[config_dataset].test_data_path, attempt_num)
+    # baseline_model = Baseline_LSTM(num_hiddens=128,
+    #                                num_layers=2,
+    #                                word_dim=50,
+    #                                vocab=tokenizer.vocab,
+    #                                labels_num=2,
+    #                                using_pretrained=False,
+    #                                bid=False,
+    #                                head_tail=False).to(config_device)
+
+    # if attach_NE:
+    #     baseline_model.load_state_dict(
+    #         torch.load(model_path[f'IMDB_LSTM_attach_NE'], map_location=config_device))
+    # else:
+    #     baseline_model.load_state_dict(
+    #         torch.load(model_path[f'IMDB_LSTM'], map_location=config_device))
+
+    # baseline_model.eval()
+    # success_num = 0
+    # try_all = 0
+    # attack_time = 0
+    # for idx, data in enumerate(datas):
+    #     adv_s, flag, end = get_fool_sentence_pwws(data, labels[idx], idx,
+    #                                               baseline_model, tokenizer,
+    #                                               True, None)
+    #     attack_time += end
+    #     if flag == 1:
+    #         success_num += 1
+    #         try_all += 1
+    #     elif flag == 0:
+    #         try_all += 1
+    # print(f'attempt_num:{attempt_num}')
+    # print(f'attack_num:{try_all}')
+    # print(f'attack_acc:{success_num / try_all}')
+    # print(f'attack_time:{attack_time}')
