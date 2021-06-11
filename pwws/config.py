@@ -1,9 +1,9 @@
 import torch
 
-config_device_name = 'cuda:0'
+config_device_name = 'cuda:1'
 config_device = torch.device(config_device_name)
 config_dataset = 'IMDB'
-attach_NE = False
+attach_NE = True
 
 
 class BertConfig():
@@ -135,7 +135,7 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'AGNEWS_Bert': 'output/train_baseline_model/2021-05-25_12:16:00/models/AGNEWS_Bert_0.94250_05-25-14-51.pt',
               'AGNEWS_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_17:30:41/models/AGNEWS_Bert_0.92803_05-26-05-35.pt',
               'IMDB_LSTM': 'output/train_baseline_model/2021-06-09_21:19:25/models/IMDB_LSTM_0.84948_06-09-21-54.pt',
-              'IMDB_LSTM_attach_NE': 'output/train_baseline_model/2021-06-07_21:28:52/models/IMDB_LSTM_0.82864_06-08-00-51.pt'}
+              'IMDB_LSTM_attach_NE': 'output/train_baseline_model/2021-06-09_22:43:59/models/IMDB_LSTM_0.82568_06-10-04-24.pt'}
 
 
 if __name__ == '__main__':
