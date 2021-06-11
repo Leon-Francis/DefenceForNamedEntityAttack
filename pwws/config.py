@@ -137,7 +137,7 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'IMDB_LSTM': 'output/train_baseline_model/2021-06-09_21:19:25/models/IMDB_LSTM_0.84948_06-09-21-54.pt',
               'IMDB_LSTM_attach_NE': 'output/train_baseline_model/2021-06-09_22:43:59/models/IMDB_LSTM_0.82568_06-10-04-24.pt',
               'IMDB_LSTM_limit_vocab': 'output/train_baseline_model/2021-06-10_22:03:23/models/IMDB_LSTM_0.84308_06-10-23-12.pt',
-              'IMDB_LSTM_MME': 'output/train_baseline_model/2021-06-10_21:42:54/models/IMDB_LSTM_0.84772_06-10-22-31.pt'}
+              'IMDB_LSTM_MNE': 'output/train_baseline_model/2021-06-10_21:42:54/models/IMDB_LSTM_0.84772_06-10-22-31.pt'}
 
 
 if __name__ == '__main__':
