@@ -5,20 +5,20 @@ bert_vocab_size = 30522
 
 class Baseline_Config():
     output_dir = 'output'
-    cuda_idx = 1
+    cuda_idx = 0
     train_device = torch.device('cuda:' + str(cuda_idx))
-    batch_size = 64
+    batch_size = 16
     dataset = 'IMDB'
-    baseline = 'TextCNN'
-    epoch = 100
+    baseline = 'Bert'
+    epoch = 30
     save_acc_limit = 0.80
 
     debug_mode = False
 
     if_mask_NE = False
     if_replace_NE = False
-
     if_attach_NE = False
+    if_adversial_training = True
 
     linear_layer_num = 2
     dropout_rate = 0.5
@@ -37,6 +37,7 @@ class IMDBConfig():
     remove_stop_words = False
     sen_len = 230
     vocab_size = bert_vocab_size
+    adversarial_data_path = r'dataset/IMDB/aclImdb/adversial_instance.std'
 
 
 class SST2Config():
@@ -74,6 +75,6 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'IMDB_LSTM': 'output/train_baseline_model/2021-06-09_21:19:25/models/IMDB_LSTM_0.84948_06-09-21-54.pt',
               'IMDB_LSTM_attach_NE': 'output/train_baseline_model/2021-06-09_22:43:59/models/IMDB_LSTM_0.82568_06-10-04-24.pt',
               'IMDB_LSTM_limit_vocab': 'output/train_baseline_model/2021-06-10_22:03:23/models/IMDB_LSTM_0.84308_06-10-23-12.pt',
-              'IMDB_LSTM_limit_vovab_attach_NE': 'output/train_baseline_model/2021-06-11_11:24:58/models/IMDB_LSTM_0.82988_06-11-17-53.pt',
+              'IMDB_LSTM_limit_vocab_attach_NE': 'output/train_baseline_model/2021-06-11_11:24:58/models/IMDB_LSTM_0.82988_06-11-17-53.pt',
               'IMDB_LSTM_MNE': 'output/train_baseline_model/2021-06-10_21:42:54/models/IMDB_LSTM_0.84772_06-10-22-31.pt',
               'IMDB_TextCNN': 'output/train_baseline_model/2021-06-14_22:48:20/models/IMDB_TextCNN_0.86168_06-14-22-53.pt'}

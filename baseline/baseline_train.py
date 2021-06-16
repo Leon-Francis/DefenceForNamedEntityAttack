@@ -21,11 +21,13 @@ def build_bert_dataset():
                                           if_mask_NE=Baseline_Config.if_mask_NE,
                                           if_replace_NE=Baseline_Config.if_replace_NE,
                                           if_attach_NE=Baseline_Config.if_attach_NE,
+                                          if_adversial_training=Baseline_Config.if_adversial_training,
                                           debug_mode=Baseline_Config.debug_mode)
         test_dataset_orig = IMDB_Dataset(train_data=False,
                                          if_mask_NE=Baseline_Config.if_mask_NE,
                                          if_replace_NE=Baseline_Config.if_replace_NE,
                                          if_attach_NE=Baseline_Config.if_attach_NE,
+                                         if_adversial_training=Baseline_Config.if_adversial_training,
                                          debug_mode=Baseline_Config.debug_mode)
     elif Baseline_Config.dataset == 'SST2':
         train_dataset_orig = SST2_Dataset(train_data=True,

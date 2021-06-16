@@ -2,16 +2,17 @@ from baseline_data import IMDB_Dataset
 import torch
 from torch.utils.data import DataLoader
 from torch import nn
-from baseline_model import Baseline_Bert
+from baseline_model import Baseline_Bert, Baseline_LSTM
 from baseline_tools import logging
 from baseline_config import Baseline_Config, dataset_config, model_path
 from tqdm import tqdm
 
-evaluate_device = torch.device('cuda:1')
+evaluate_device = torch.device('cuda:0')
 
 
-def build_dataset(if_mask_NE, if_replace_NE, if_attach_NE):
+def build_dataset(vocab, if_mask_NE, if_replace_NE, if_attach_NE):
     test_dataset_orig = IMDB_Dataset(train_data=False,
+                                     vocab=vocab,
                                      if_mask_NE=if_mask_NE,
                                      if_replace_NE=if_replace_NE,
                                      if_attach_NE=if_attach_NE,
@@ -43,31 +44,53 @@ def evaluate(test_data, baseline_model, criterion):
     return loss_mean / len(test_data), correct / total
 
 
+class BaselineTokenizer():
+    def __init__(self, if_mask_NE, if_replace_NE, if_attach_NE):
+        train_dataset_orig = IMDB_Dataset(train_data=True,
+                                          if_mask_NE=if_mask_NE,
+                                          if_replace_NE=if_replace_NE,
+                                          if_attach_NE=if_attach_NE,
+                                          debug_mode=False)
+        self.vocab = train_dataset_orig.vocab
+        self.tokenizer = train_dataset_orig.tokenizer
+
+    def tokenize(self, sen):
+        return self.tokenizer.tokenize(sen)
+
+    def convert_tokens_to_ids(self, word):
+        return self.vocab.get_index(word)
+
+
 if __name__ == '__main__':
 
     if_mask_NE = False
     if_replace_NE = False
-    if_attach_NE = False
+    if_attach_NE = True
     if if_mask_NE:
-        model_name = 'IMDB_Bert_MNE'
+        model_name = 'IMDB_LSTM_MNE'
     elif if_replace_NE:
-        model_name = 'IMDB_Bert_replace_NE'
+        model_name = 'IMDB_LSTM_replace_NE'
     elif if_attach_NE:
-        model_name = 'IMDB_Bert_attach_NE'
+        model_name = 'IMDB_LSTM_limit_vocab_attach_NE'
     else:
-        model_name = 'IMDB_Bert'
+        model_name = 'IMDB_LSTM_limit_vocab'
 
-    test_data = build_dataset(if_mask_NE, if_replace_NE, if_attach_NE)
+    tokenizer = BaselineTokenizer(if_mask_NE, if_replace_NE, if_attach_NE)
 
-    baseline_model = Baseline_Bert(
-        label_num=dataset_config[Baseline_Config.dataset].labels_num,
-        linear_layer_num=Baseline_Config.linear_layer_num,
-        dropout_rate=Baseline_Config.dropout_rate,
-        is_fine_tuning=Baseline_Config.is_fine_tuning).to(
-            evaluate_device)
+    test_data = build_dataset(
+        tokenizer.vocab, if_mask_NE, if_replace_NE, if_attach_NE)
+
+    baseline_model = Baseline_LSTM(num_hiddens=128,
+                                   num_layers=2,
+                                   word_dim=50,
+                                   vocab=tokenizer.vocab,
+                                   labels_num=2,
+                                   using_pretrained=False,
+                                   bid=False,
+                                   head_tail=False).to(evaluate_device)
 
     baseline_model.load_state_dict(
-        torch.load(model_path['IMDB_Bert'], map_location=evaluate_device))
+        torch.load(model_path[model_name], map_location=evaluate_device))
 
     criterion = nn.CrossEntropyLoss().to(evaluate_device)
 

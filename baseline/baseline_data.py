@@ -22,6 +22,7 @@ class IMDB_Dataset(Dataset):
                  if_mask_NE=False,
                  if_replace_NE=False,
                  if_attach_NE=False,
+                 if_adversial_training=False,
                  debug_mode=False):
         super(IMDB_Dataset, self).__init__()
         self.train_model = train_data
@@ -67,7 +68,7 @@ class IMDB_Dataset(Dataset):
         imdb_1 = json.loads(content_1)
         f_1.close()
         self.imdb_attach_NE = [imdb_0, imdb_1]
-        self.data2tokens(if_mask_NE, if_replace_NE, if_attach_NE)
+        self.data2tokens(if_mask_NE, if_replace_NE, if_attach_NE, if_adversial_training)
         if Baseline_Config.baseline == 'Bert':
             self.vocab = None
         else:
@@ -101,7 +102,7 @@ class IMDB_Dataset(Dataset):
         logging(f'loading data {len(data)} from {path}')
         return data, labels
 
-    def data2tokens(self, if_mask_NE, if_replace_NE, if_attach_NE):
+    def data2tokens(self, if_mask_NE, if_replace_NE, if_attach_NE, if_adversial_training):
         logging(f'{self.path} in data2tokens')
         if self.train_model and if_mask_NE:
             for sen in self.datas:
@@ -161,6 +162,21 @@ class IMDB_Dataset(Dataset):
                     temp_label_list.append(self.classification_label[sen_idx])
             self.classification_label = temp_label_list
             logging(f'NE samples = {NE_samples}\nNE nums = {NE_nums}')
+        elif self.train_model and if_adversial_training:
+            for sen in self.datas:
+                tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
+                self.data_tokens.append(tokens)
+            i = 15000
+            with open(IMDBConfig.adversarial_data_path, 'r', encoding='utf-8') as file:
+                for line in file:
+                    i -= 1
+                    line = line.strip('\n')
+                    sen = line[:-1]
+                    tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
+                    self.data_tokens.append(tokens)
+                    self.classification_label.append(int(line[-1]))
+                    if i == 0:
+                        break
         else:
             for sen in self.datas:
                 tokens = self.tokenizer.tokenize(sen)[:self.sen_len]
