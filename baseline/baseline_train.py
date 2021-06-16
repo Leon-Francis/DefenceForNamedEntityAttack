@@ -77,6 +77,7 @@ def build_dataset():
 
 
 def train(train_data, baseline_model, criterion, optimizer):
+    baseline_model.train()
     loss_mean = 0.0
     for x, y in train_data:
         x, y = x.to(Baseline_Config.train_device), y.to(
@@ -94,6 +95,7 @@ def train(train_data, baseline_model, criterion, optimizer):
 
 @torch.no_grad()
 def evaluate(test_data, baseline_model, criterion):
+    baseline_model.eval()
     loss_mean = 0.0
     correct = 0
     total = 0
@@ -191,21 +193,21 @@ if __name__ == '__main__':
                                           num_channels=[50, 50, 50],
                                           kernel_sizes=[3, 4, 5],
                                           labels_num=2,
-                                          is_batch_normal=True).to(
+                                          is_batch_normal=False).to(
             Baseline_Config.train_device)
 
-        optimizer = optim.AdamW(baseline_model.parameters(
-        ), lr=Baseline_Config.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=1e-3)
+        optimizer = optim.Adam(
+            baseline_model.parameters(), lr=Baseline_Config.lr)
 
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer,
                                                      mode='min',
-                                                     factor=0.85,
+                                                     factor=0.95,
                                                      patience=3,
                                                      verbose=True,
-                                                     min_lr=3e-8)
+                                                     min_lr=3e-9)
     warmup_scheduler = optim.lr_scheduler.LambdaLR(optimizer,
                                                    lr_lambda=lambda ep: 1e-2
-                                                   if ep < 4 else 1.0)
+                                                   if ep < 3 else 1.0)
 
     criterion = nn.CrossEntropyLoss().to(Baseline_Config.train_device)
 
@@ -228,8 +230,10 @@ if __name__ == '__main__':
                 logging(f'saving best model acc {best_acc:.5f} in {temp_path}')
                 torch.save(best_state, temp_path)
 
-        warmup_scheduler.step(ep + 1)
-        scheduler.step(evaluate_loss, ep + 1)
+        if ep < 4:
+            warmup_scheduler.step(ep)
+        else:
+            scheduler.step(evaluate_loss, epoch=ep)
 
         logging(
             f'epoch {ep} done! train_loss {train_loss:.5f} evaluate_loss {evaluate_loss:.5f} \n'

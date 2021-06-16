@@ -25,6 +25,7 @@ def build_dataset(if_mask_NE, if_replace_NE, if_attach_NE):
 
 @torch.no_grad()
 def evaluate(test_data, baseline_model, criterion):
+    baseline_model.eval()
     loss_mean = 0.0
     correct = 0
     total = 0
@@ -44,7 +45,7 @@ def evaluate(test_data, baseline_model, criterion):
 
 if __name__ == '__main__':
 
-    if_mask_NE = True
+    if_mask_NE = False
     if_replace_NE = False
     if_attach_NE = False
     if if_mask_NE:
@@ -66,7 +67,7 @@ if __name__ == '__main__':
             evaluate_device)
 
     baseline_model.load_state_dict(
-        torch.load(model_path[model_name], map_location=evaluate_device))
+        torch.load(model_path['IMDB_Bert'], map_location=evaluate_device))
 
     criterion = nn.CrossEntropyLoss().to(evaluate_device)
 
