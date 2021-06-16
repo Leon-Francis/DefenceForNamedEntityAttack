@@ -142,7 +142,7 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'IMDB_LSTM_limit_vocab': 'output/train_baseline_model/2021-06-10_22:03:23/models/IMDB_LSTM_0.85852_06-10-23-12.pt',
               'IMDB_LSTM_limit_vocab_MNE': 'output/train_baseline_model/2021-06-16_17:20:06/models/IMDB_LSTM_0.87360_06-16-18-17.pt',
               'IMDB_LSTM_limit_vocab_replace_NE': 'output/train_baseline_model/2021-06-16_17:18:12/models/IMDB_LSTM_0.87532_06-16-18-14.pt',
-    #          'IMDB_LSTM_limit_vocab_attach_NE': 'output/train_baseline_model/2021-06-11_11:24:58/models/IMDB_LSTM_0.82988_06-11-17-53.pt',
+              'IMDB_LSTM_limit_vocab_attach_NE': 'output/train_baseline_model/2021-06-11_11:24:58/models/IMDB_LSTM_0.83784_06-11-17-53.pt',
               'IMDB_TextCNN': 'output/train_baseline_model/2021-06-14_22:48:20/models/IMDB_TextCNN_0.86168_06-14-22-53.pt',
               'IMDB_TextCNN_MNE': 'output/train_baseline_model/2021-06-16_17:25:26/models/IMDB_TextCNN_0.84924_06-16-18-03.pt',
               'IMDB_TextCNN_replace_NE': 'output/train_baseline_model/2021-06-16_17:26:22/models/IMDB_TextCNN_0.86164_06-16-18-06.pt',
