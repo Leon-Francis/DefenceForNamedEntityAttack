@@ -1,9 +1,8 @@
 import torch
 
-config_device_name = 'cuda:1'
+config_device_name = 'cuda:0'
 config_device = torch.device(config_device_name)
 config_dataset = 'IMDB'
-attach_NE = True
 
 
 class BertConfig():

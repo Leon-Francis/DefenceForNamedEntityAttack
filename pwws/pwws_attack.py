@@ -3,7 +3,7 @@ import attr
 import spacy
 from nltk.corpus import wordnet as wn
 from tools import str2seq, read_text_test_data
-from config import config_device, config_pwws_use_NE, attach_NE, \
+from config import config_device, config_pwws_use_NE, \
     config_data, config_dataset, model_path, config_pww_NNE_attack, BertConfig
 import numpy as np
 from get_NE_list import NE_list
@@ -418,8 +418,8 @@ class BaselineTokenizer():
     def __init__(self):
         train_dataset_orig = IMDB_Dataset(train_data=True,
                                           if_mask_NE=False,
-                                          if_replace_NE=False,
-                                          if_attach_NE=True,
+                                          if_replace_NE=True,
+                                          if_attach_NE=False,
                                           debug_mode=False)
         self.vocab = train_dataset_orig.vocab
         self.tokenizer = train_dataset_orig.tokenizer
@@ -482,12 +482,8 @@ if __name__ == '__main__':
                                    bid=False,
                                    head_tail=False).to(config_device)
 
-    if attach_NE:
-        baseline_model.load_state_dict(
-            torch.load(model_path[f'IMDB_LSTM_attach_NE'], map_location=config_device))
-    else:
-        baseline_model.load_state_dict(
-            torch.load(model_path[f'IMDB_LSTM'], map_location=config_device))
+    baseline_model.load_state_dict(
+        torch.load(model_path[f'IMDB_LSTM_replace_NE'], map_location=config_device))
 
     baseline_model.eval()
     success_num = 0
