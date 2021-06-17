@@ -439,7 +439,7 @@ class AGNEWS_Dataset(Dataset):
 class Baseline_Vocab():
     def __init__(self,
                  origin_data_tokens,
-                 vocab_limit_size=80000,
+                 vocab_limit_size=30522,
                  is_special=False,
                  is_using_pretrained=True,
                  word_vec_file_path=r'./static/glove.6B.100d.txt'):
