@@ -418,8 +418,8 @@ class BaselineTokenizer():
     def __init__(self):
         train_dataset_orig = IMDB_Dataset(train_data=True,
                                           if_mask_NE=False,
-                                          if_replace_NE=True,
-                                          if_attach_NE=False,
+                                          if_replace_NE=False,
+                                          if_attach_NE=True,
                                           debug_mode=False)
         self.vocab = train_dataset_orig.vocab
         self.tokenizer = train_dataset_orig.tokenizer
@@ -473,17 +473,27 @@ if __name__ == '__main__':
     tokenizer = BaselineTokenizer()
     datas, labels = read_text_test_data(
         dataset_config[config_dataset].test_data_path, attempt_num)
-    baseline_model = Baseline_LSTM(num_hiddens=128,
-                                   num_layers=2,
-                                   word_dim=50,
-                                   vocab=tokenizer.vocab,
-                                   labels_num=2,
-                                   using_pretrained=False,
-                                   bid=False,
-                                   head_tail=False).to(config_device)
+    # baseline_model = Baseline_LSTM(num_hiddens=128,
+    #                                num_layers=2,
+    #                                word_dim=50,
+    #                                vocab=tokenizer.vocab,
+    #                                labels_num=2,
+    #                                using_pretrained=False,
+    #                                bid=False,
+    #                                head_tail=False).to(config_device)
+
+    baseline_model = Baseline_TextCNN(vocab=tokenizer.vocab,
+                                      train_embedding_word_dim=50,
+                                      is_static=True,
+                                      using_pretrained=True,
+                                      num_channels=[50, 50, 50],
+                                      kernel_sizes=[3, 4, 5],
+                                      labels_num=2,
+                                      is_batch_normal=False).to(config_device)
+
 
     baseline_model.load_state_dict(
-        torch.load(model_path[f'IMDB_LSTM_replace_NE'], map_location=config_device))
+        torch.load(model_path[f'IMDB_TextCNN_attach_NE'], map_location=config_device))
 
     baseline_model.eval()
     success_num = 0
