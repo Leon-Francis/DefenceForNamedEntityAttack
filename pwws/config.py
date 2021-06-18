@@ -143,7 +143,7 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'IMDB_LSTM_limit_vocab_MNE': 'output/train_baseline_model/2021-06-16_17:20:06/models/IMDB_LSTM_0.87360_06-16-18-17.pt',
               'IMDB_LSTM_limit_vocab_replace_NE': 'output/train_baseline_model/2021-06-16_17:18:12/models/IMDB_LSTM_0.87532_06-16-18-14.pt',
               'IMDB_LSTM_limit_vocab_attach_NE': 'output/train_baseline_model/2021-06-11_11:24:58/models/IMDB_LSTM_0.83784_06-11-17-53.pt',
-              'IMDB_LSTM_limit_vocab_adversial_training': 'output/train_baseline_model/2021-06-17_17:24:12/models/IMDB_LSTM_0.87208_06-17-18-29.pt',
+              'IMDB_LSTM_limit_vocab_adversial_training': 'output/train_baseline_model/2021-06-18_11:36:09/models/IMDB_LSTM_0.86500_06-18-11-54.pt',
               'IMDB_TextCNN': 'output/train_baseline_model/2021-06-14_22:48:20/models/IMDB_TextCNN_0.86168_06-14-22-53.pt',
               'IMDB_TextCNN_MNE': 'output/train_baseline_model/2021-06-16_17:25:26/models/IMDB_TextCNN_0.84924_06-16-18-03.pt',
               'IMDB_TextCNN_replace_NE': 'output/train_baseline_model/2021-06-16_17:26:22/models/IMDB_TextCNN_0.86164_06-16-18-06.pt',
@@ -152,8 +152,7 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'IMDB_TextCNN_limit_vocab_MNE': 'output/train_baseline_model/2021-06-17_17:19:27/models/IMDB_TextCNN_0.86388_06-17-17-56.pt',
               'IMDB_TextCNN_limit_vocab_replace_NE': 'output/train_baseline_model/2021-06-17_17:19:45/models/IMDB_TextCNN_0.86400_06-17-17-52.pt',
               'IMDB_TextCNN_limit_vocab_attach_NE': 'output/train_baseline_model/2021-06-17_17:20:09/models/IMDB_TextCNN_0.83636_06-17-18-54.pt',
-              'IMDB_TextCNN_limit_vocab_adversial_training': 'output/train_baseline_model/2021-06-17_17:20:26/models/IMDB_TextCNN_0.86400_06-17-17-32.pt'}
-
+              'IMDB_TextCNN_limit_vocab_adversial_training': 'output/train_baseline_model/2021-06-18_11:37:55/models/IMDB_TextCNN_0.85640_06-18-11-49.pt'}
 
 if __name__ == '__main__':
     pass
