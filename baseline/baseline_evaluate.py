@@ -18,7 +18,7 @@ def build_dataset(vocab, if_mask_NE, if_replace_NE, if_attach_NE):
                                      if_attach_NE=if_attach_NE,
                                      debug_mode=False)
     test_data = DataLoader(test_dataset_orig,
-                           batch_size=Baseline_Config.batch_size,
+                           batch_size=64,
                            shuffle=False,
                            num_workers=4)
     return test_data
@@ -50,6 +50,7 @@ class BaselineTokenizer():
                                           if_mask_NE=if_mask_NE,
                                           if_replace_NE=if_replace_NE,
                                           if_attach_NE=if_attach_NE,
+                                          if_adversial_training=True,
                                           debug_mode=False)
         self.vocab = train_dataset_orig.vocab
         self.tokenizer = train_dataset_orig.tokenizer
@@ -65,7 +66,7 @@ if __name__ == '__main__':
 
     if_mask_NE = False
     if_replace_NE = False
-    if_attach_NE = True
+    if_attach_NE = False
     if if_mask_NE:
         model_name = 'IMDB_LSTM_MNE'
     elif if_replace_NE:
@@ -90,7 +91,7 @@ if __name__ == '__main__':
                                    head_tail=False).to(evaluate_device)
 
     baseline_model.load_state_dict(
-        torch.load(model_path[model_name], map_location=evaluate_device))
+        torch.load(model_path['IMDB_LSTM_limit_vocab_adversial_training'], map_location=evaluate_device))
 
     criterion = nn.CrossEntropyLoss().to(evaluate_device)
 
