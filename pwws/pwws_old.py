@@ -15,7 +15,7 @@ from transformers import BertTokenizer
 from baseline_model import Baseline_Bert
 from baseline_config import Baseline_Config, dataset_config
 from baseline_data import IMDB_Dataset
-from baseline_model import Baseline_Bert, Baseline_LSTM
+from baseline_model import Baseline_Bert, Baseline_LSTM, Baseline_TextCNN
 '''
     ATTENTION:
     Below three functions (PWWS, evaluate_word_saliency, adversarial_paraphrase)
@@ -409,6 +409,7 @@ class BaselineTokenizer():
                                           if_mask_NE=False,
                                           if_replace_NE=False,
                                           if_attach_NE=False,
+                                          if_adversial_training=False,
                                           debug_mode=False)
         self.vocab = train_dataset_orig.vocab
         self.tokenizer = train_dataset_orig.tokenizer
@@ -426,18 +427,51 @@ if __name__ == '__main__':
     tokenizer = BaselineTokenizer()
     datas, labels = read_text_test_data(
         dataset_config[config_dataset].test_data_path, attempt_num)
-    baseline_model = Baseline_LSTM(num_hiddens=128,
-                                   num_layers=2,
-                                   word_dim=50,
-                                   vocab=tokenizer.vocab,
-                                   labels_num=2,
-                                   using_pretrained=False,
-                                   bid=False,
-                                   head_tail=False).to(config_device)
+    baseline_model = Baseline_TextCNN(vocab=tokenizer.vocab,
+                                      train_embedding_word_dim=50,
+                                      is_static=True,
+                                      using_pretrained=True,
+                                      num_channels=[50, 50, 50],
+                                      kernel_sizes=[3, 4, 5],
+                                      labels_num=2,
+                                      is_batch_normal=False).to(config_device)
 
     baseline_model.load_state_dict(
-        torch.load(model_path[f'IMDB_LSTM_limit_vocab'],
+        torch.load(model_path[f'IMDB_TextCNN_limit_vocab'],
                    map_location=config_device))
+
+    baseline_model.eval()
+    success_num = 0
+    try_all = 0
+    attack_time = 0
+    for idx, data in enumerate(datas):
+        adv_s, flag, end = get_fool_sentence_pwws(data, labels[idx], idx,
+                                                  baseline_model, tokenizer,
+                                                  True, None)
+        attack_time += end
+        if flag == 1:
+            success_num += 1
+            try_all += 1
+        elif flag == 0:
+            try_all += 1
+    print(f'attempt_num:{attempt_num}')
+    print(f'attack_num:{try_all}')
+    print(f'attack_acc:{success_num / try_all}')
+    print(f'attack_time:{attack_time}')
+
+    # attempt_num = 100
+
+    # tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    # datas, labels = read_text_test_data(
+    #     dataset_config[config_dataset].test_data_path, attempt_num)
+    # baseline_model = Baseline_Bert(
+    #     label_num=dataset_config[config_dataset].labels_num,
+    #     linear_layer_num=BertConfig.linear_layer_num[config_dataset],
+    #     dropout_rate=BertConfig.dropout_rate[config_dataset],
+    #     is_fine_tuning=BertConfig.is_fine_tuning[config_dataset]).to(config_device)
+
+    # baseline_model.load_state_dict(
+    #     torch.load(model_path['SST2_Bert'], map_location=config_device))
 
     baseline_model.eval()
     success_num = 0

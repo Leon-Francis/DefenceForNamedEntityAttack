@@ -1,7 +1,7 @@
 import __init__paths
 import torch
 from transformers import BertTokenizer
-from baseline_model import Baseline_Bert
+from baseline_model import Baseline_Bert, Baseline_LSTM, Baseline_TextCNN
 from config import BertConfig, config_dataset, model_path, IMDBConfig
 from baseline_config import dataset_config
 from tools import read_text_data, logging
@@ -9,23 +9,47 @@ from random import choice
 import json
 import spacy
 import numpy as np
+from baseline_data import IMDB_Dataset
 nlp = spacy.load('en_core_web_sm')
 attempt_num = 100
 N = 100
 config_device = torch.device('cuda:0')
 attach_NE = True
 
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+class BaselineTokenizer():
+    def __init__(self):
+        train_dataset_orig = IMDB_Dataset(train_data=True,
+                                          if_mask_NE=False,
+                                          if_replace_NE=False,
+                                          if_attach_NE=False,
+                                          if_adversial_training=True,
+                                          debug_mode=False)
+        self.vocab = train_dataset_orig.vocab
+        self.tokenizer = train_dataset_orig.tokenizer
+
+    def tokenize(self, sen):
+        return self.tokenizer.tokenize(sen)
+
+    def convert_tokens_to_ids(self, word):
+        return [self.vocab.get_index(w) for w in word]
+
+
+tokenizer = BaselineTokenizer()
 datas, labels = read_text_data(dataset_config[config_dataset].test_data_path,
                                attempt_num)
-baseline_model = Baseline_Bert(
-    label_num=dataset_config[config_dataset].labels_num,
-    linear_layer_num=BertConfig.linear_layer_num[config_dataset],
-    dropout_rate=BertConfig.dropout_rate[config_dataset],
-    is_fine_tuning=BertConfig.is_fine_tuning[config_dataset]).to(config_device)
+
+baseline_model = Baseline_TextCNN(vocab=tokenizer.vocab,
+                                  train_embedding_word_dim=50,
+                                  is_static=True,
+                                  using_pretrained=True,
+                                  num_channels=[50, 50, 50],
+                                  kernel_sizes=[3, 4, 5],
+                                  labels_num=2,
+                                  is_batch_normal=False).to(config_device)
 
 baseline_model.load_state_dict(
-    torch.load(model_path['IMDB_Bert_attach_NE_inhance'],
+    torch.load(model_path['IMDB_TextCNN_limit_vocab_adversial_training'],
                map_location=config_device))
 
 baseline_model.eval()

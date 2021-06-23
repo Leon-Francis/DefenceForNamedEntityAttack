@@ -160,7 +160,7 @@ if __name__ == '__main__':
                                        num_layers=2,
                                        word_dim=50,
                                        vocab=vocab,
-                                       labels_num=2,
+                                       labels_num=dataset_config[Baseline_Config.dataset].labels_num,
                                        using_pretrained=False,
                                        bid=True,
                                        head_tail=False).to(
@@ -177,7 +177,7 @@ if __name__ == '__main__':
                                        num_layers=2,
                                        word_dim=50,
                                        vocab=vocab,
-                                       labels_num=2,
+                                       labels_num=dataset_config[Baseline_Config.dataset].labels_num,
                                        using_pretrained=False,
                                        bid=False,
                                        head_tail=False).to(
