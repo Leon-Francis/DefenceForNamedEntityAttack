@@ -17,7 +17,7 @@ class Baseline_Config():
 
     if_mask_NE = False
     if_replace_NE = False
-    if_attach_NE = False
+    if_attach_NE = True
     if_adversial_training = False
 
     linear_layer_num = 1
@@ -74,6 +74,7 @@ model_path = {'IMDB_Bert_MNE': 'output/train_baseline_model/2021-05-12_12:57:41/
               'SST2_Bert': 'output/train_baseline_model/2021-05-24_22:50:17/models/SST2_Bert_0.87078_05-24-22-59.pt',
               'AGNEWS_Bert': 'output/train_baseline_model/2021-05-25_12:16:00/models/AGNEWS_Bert_0.94250_05-25-14-51.pt',
               'AGNEWS_Bert_attach_NE': 'output/train_baseline_model/2021-05-25_17:30:41/models/AGNEWS_Bert_0.92803_05-26-05-35.pt',
+              'AGNEWS_TextCNN_limit_vocab': 'output/train_baseline_model/2021-06-23_16:53:25/models/AGNEWS_TextCNN_0.91671_06-23-16-57.pt',
               'IMDB_LSTM': 'output/train_baseline_model/2021-06-09_21:19:25/models/IMDB_LSTM_0.85636_06-09-21-54.pt',
               'IMDB_LSTM_MNE': 'output/train_baseline_model/2021-06-10_21:42:54/models/IMDB_LSTM_0.86404_06-10-22-31.pt',
               'IMDB_LSTM_replace_NE': 'output/train_baseline_model/2021-06-16_18:37:22/models/IMDB_LSTM_0.87340_06-16-19-14.pt',

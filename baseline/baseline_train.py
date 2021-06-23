@@ -206,7 +206,7 @@ if __name__ == '__main__':
                                           using_pretrained=True,
                                           num_channels=[50, 50, 50],
                                           kernel_sizes=[3, 4, 5],
-                                          labels_num=2,
+                                          labels_num=dataset_config[Baseline_Config.dataset].labels_num,
                                           is_batch_normal=False).to(
             Baseline_Config.train_device)
 

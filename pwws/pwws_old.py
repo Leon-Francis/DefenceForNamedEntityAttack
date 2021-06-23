@@ -14,7 +14,7 @@ import time
 from transformers import BertTokenizer
 from baseline_model import Baseline_Bert
 from baseline_config import Baseline_Config, dataset_config
-from baseline_data import IMDB_Dataset
+from baseline_data import IMDB_Dataset, AGNEWS_Dataset
 from baseline_model import Baseline_Bert, Baseline_LSTM, Baseline_TextCNN
 '''
     ATTENTION:
@@ -405,12 +405,17 @@ def get_fool_sentence_pwws(sentence: str, label: int, index: int, net,
 
 class BaselineTokenizer():
     def __init__(self):
-        train_dataset_orig = IMDB_Dataset(train_data=True,
-                                          if_mask_NE=False,
-                                          if_replace_NE=False,
-                                          if_attach_NE=False,
-                                          if_adversial_training=False,
-                                          debug_mode=False)
+        if config_dataset == 'IMDB':
+            train_dataset_orig = IMDB_Dataset(train_data=True,
+                                              if_mask_NE=False,
+                                              if_replace_NE=False,
+                                              if_attach_NE=False,
+                                              if_adversial_training=False,
+                                              debug_mode=False)
+        elif config_dataset == 'AGNEWS':
+            train_dataset_orig = AGNEWS_Dataset(train_data=True,
+                                                if_attach_NE=False,
+                                                debug_mode=False)
         self.vocab = train_dataset_orig.vocab
         self.tokenizer = train_dataset_orig.tokenizer
 
@@ -433,11 +438,11 @@ if __name__ == '__main__':
                                       using_pretrained=True,
                                       num_channels=[50, 50, 50],
                                       kernel_sizes=[3, 4, 5],
-                                      labels_num=2,
+                                      labels_num=dataset_config[config_dataset].labels_num,
                                       is_batch_normal=False).to(config_device)
 
     baseline_model.load_state_dict(
-        torch.load(model_path[f'IMDB_TextCNN_limit_vocab'],
+        torch.load(model_path[f'AGNEWS_TextCNN_limit_vocab'],
                    map_location=config_device))
 
     baseline_model.eval()

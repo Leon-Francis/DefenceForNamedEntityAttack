@@ -14,7 +14,7 @@ import time
 from transformers import BertTokenizer
 from baseline_model import Baseline_Bert, Baseline_LSTM, Baseline_TextCNN
 from baseline_config import Baseline_Config, dataset_config
-from baseline_data import IMDB_Dataset
+from baseline_data import IMDB_Dataset, AGNEWS_Dataset
 '''
     ATTENTION:
     Below three functions (PWWS, evaluate_word_saliency, adversarial_paraphrase)
@@ -416,12 +416,17 @@ def get_fool_sentence_pwws(sentence: str, label: int, index: int, net,
 
 class BaselineTokenizer():
     def __init__(self):
-        train_dataset_orig = IMDB_Dataset(train_data=True,
-                                          if_mask_NE=False,
-                                          if_replace_NE=False,
-                                          if_attach_NE=False,
-                                          if_adversial_training=True,
-                                          debug_mode=False)
+        if config_dataset == 'IMDB':
+            train_dataset_orig = IMDB_Dataset(train_data=True,
+                                              if_mask_NE=False,
+                                              if_replace_NE=False,
+                                              if_attach_NE=False,
+                                              if_adversial_training=False,
+                                              debug_mode=False)
+        elif config_dataset == 'AGNEWS':
+            train_dataset_orig = AGNEWS_Dataset(train_data=True,
+                                                if_attach_NE=False,
+                                                debug_mode=False)
         self.vocab = train_dataset_orig.vocab
         self.tokenizer = train_dataset_orig.tokenizer
 
@@ -471,26 +476,26 @@ if __name__ == '__main__':
     tokenizer = BaselineTokenizer()
     datas, labels = read_text_test_data(
         dataset_config[config_dataset].test_data_path, attempt_num)
-    baseline_model = Baseline_LSTM(num_hiddens=128,
-                                   num_layers=2,
-                                   word_dim=50,
-                                   vocab=tokenizer.vocab,
-                                   labels_num=2,
-                                   using_pretrained=False,
-                                   bid=False,
-                                   head_tail=False).to(config_device)
+    # baseline_model = Baseline_LSTM(num_hiddens=128,
+    #                                num_layers=2,
+    #                                word_dim=50,
+    #                                vocab=tokenizer.vocab,
+    #                                labels_num=2,
+    #                                using_pretrained=False,
+    #                                bid=False,
+    #                                head_tail=False).to(config_device)
 
-    # baseline_model = Baseline_TextCNN(vocab=tokenizer.vocab,
-    #                                   train_embedding_word_dim=50,
-    #                                   is_static=True,
-    #                                   using_pretrained=True,
-    #                                   num_channels=[50, 50, 50],
-    #                                   kernel_sizes=[3, 4, 5],
-    #                                   labels_num=2,
-    #                                   is_batch_normal=False).to(config_device)
+    baseline_model = Baseline_TextCNN(vocab=tokenizer.vocab,
+                                      train_embedding_word_dim=50,
+                                      is_static=True,
+                                      using_pretrained=True,
+                                      num_channels=[50, 50, 50],
+                                      kernel_sizes=[3, 4, 5],
+                                      labels_num=dataset_config[config_dataset].labels_num,
+                                      is_batch_normal=False).to(config_device)
 
     baseline_model.load_state_dict(
-        torch.load(model_path[f'IMDB_LSTM_limit_vocab_adversial_training'], map_location=config_device))
+        torch.load(model_path[f'AGNEWS_TextCNN_limit_vocab'], map_location=config_device))
 
     baseline_model.eval()
     success_num = 0

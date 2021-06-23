@@ -333,14 +333,6 @@ class AGNEWS_Dataset(Dataset):
         self.data_tokens = []
         self.data_idx = []
 
-        if Baseline_Config.baseline == 'Bert':
-            self.vocab = None
-        else:
-            if not vocab:
-                self.vocab = Baseline_Vocab(self.data_tokens)
-            else:
-                self.vocab = vocab
-
         f_0 = open('pwws/NE_dict/AGNEWS_adv_0.json', 'r')
         content_0 = f_0.read()
         agnews_0 = json.loads(content_0)
@@ -361,6 +353,13 @@ class AGNEWS_Dataset(Dataset):
         self.agnews_attach_NE = [agnews_0, agnews_1, agnews_2, agnews_3]
 
         self.data2tokens(if_attach_NE)
+        if Baseline_Config.baseline == 'Bert':
+            self.vocab = None
+        else:
+            if not vocab:
+                self.vocab = Baseline_Vocab(self.data_tokens)
+            else:
+                self.vocab = vocab
         self.token2idx()
         self.transfor()
 
