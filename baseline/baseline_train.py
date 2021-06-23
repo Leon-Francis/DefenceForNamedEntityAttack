@@ -55,20 +55,30 @@ def build_bert_dataset():
 
 
 def build_dataset():
-    train_dataset_orig = IMDB_Dataset(train_data=True,
-                                      if_mask_NE=Baseline_Config.if_mask_NE,
-                                      if_replace_NE=Baseline_Config.if_replace_NE,
-                                      if_attach_NE=Baseline_Config.if_attach_NE,
-                                      if_adversial_training=Baseline_Config.if_adversial_training,
-                                      debug_mode=Baseline_Config.debug_mode)
+    if Baseline_Config.dataset == 'IMDB':
+        train_dataset_orig = IMDB_Dataset(train_data=True,
+                                          if_mask_NE=Baseline_Config.if_mask_NE,
+                                          if_replace_NE=Baseline_Config.if_replace_NE,
+                                          if_attach_NE=Baseline_Config.if_attach_NE,
+                                          if_adversial_training=Baseline_Config.if_adversial_training,
+                                          debug_mode=Baseline_Config.debug_mode)
 
-    test_dataset_orig = IMDB_Dataset(train_data=False,
-                                     vocab=train_dataset_orig.vocab,
-                                     if_mask_NE=Baseline_Config.if_mask_NE,
-                                     if_replace_NE=Baseline_Config.if_replace_NE,
-                                     if_attach_NE=Baseline_Config.if_attach_NE,
-                                     if_adversial_training=Baseline_Config.if_adversial_training,
-                                     debug_mode=Baseline_Config.debug_mode)
+        test_dataset_orig = IMDB_Dataset(train_data=False,
+                                         vocab=train_dataset_orig.vocab,
+                                         if_mask_NE=Baseline_Config.if_mask_NE,
+                                         if_replace_NE=Baseline_Config.if_replace_NE,
+                                         if_attach_NE=Baseline_Config.if_attach_NE,
+                                         if_adversial_training=Baseline_Config.if_adversial_training,
+                                         debug_mode=Baseline_Config.debug_mode)
+    elif Baseline_Config.dataset == 'AGNEWS':
+        train_dataset_orig = AGNEWS_Dataset(train_data=True,
+                                            if_attach_NE=Baseline_Config.if_attach_NE,
+                                            debug_mode=Baseline_Config.debug_mode)
+
+        test_dataset_orig = AGNEWS_Dataset(train_data=False,
+                                           vocab=train_dataset_orig.vocab,
+                                           if_attach_NE=Baseline_Config.if_attach_NE,
+                                           debug_mode=Baseline_Config.debug_mode)
     train_data = DataLoader(train_dataset_orig,
                             batch_size=Baseline_Config.batch_size,
                             shuffle=True,

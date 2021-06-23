@@ -319,7 +319,7 @@ class SST2_Dataset(Dataset):
 
 
 class AGNEWS_Dataset(Dataset):
-    def __init__(self, train_data=True, if_attach_NE=False, debug_mode=False):
+    def __init__(self, vocab, train_data=True, if_attach_NE=False, debug_mode=False):
         super(AGNEWS_Dataset, self).__init__()
         self.train_model = train_data
         if train_data:
@@ -332,6 +332,14 @@ class AGNEWS_Dataset(Dataset):
         self.sen_len = AGNEWSConfig.sen_len
         self.data_tokens = []
         self.data_idx = []
+
+        if Baseline_Config.baseline == 'Bert':
+            self.vocab = None
+        else:
+            if not vocab:
+                self.vocab = Baseline_Vocab(self.data_tokens)
+            else:
+                self.vocab = vocab
 
         f_0 = open('pwws/NE_dict/AGNEWS_adv_0.json', 'r')
         content_0 = f_0.read()
@@ -417,8 +425,14 @@ class AGNEWS_Dataset(Dataset):
 
     def token2idx(self):
         logging(f'{self.path} in token2idx')
-        for tokens in self.data_tokens:
-            self.data_idx.append(self.tokenizer.convert_tokens_to_ids(tokens))
+        if not self.vocab:
+            for tokens in self.data_tokens:
+                self.data_idx.append(
+                    self.tokenizer.convert_tokens_to_ids(tokens))
+        else:
+            for tokens in self.data_tokens:
+                self.data_idx.append(
+                    [self.vocab.get_index(token) for token in tokens])
 
         for i in range(len(self.data_idx)):
             if len(self.data_idx[i]) < self.sen_len:
