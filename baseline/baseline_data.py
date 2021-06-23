@@ -319,7 +319,7 @@ class SST2_Dataset(Dataset):
 
 
 class AGNEWS_Dataset(Dataset):
-    def __init__(self, vocab, train_data=True, if_attach_NE=False, debug_mode=False):
+    def __init__(self, train_data=True, vocab=None, if_attach_NE=False, debug_mode=False):
         super(AGNEWS_Dataset, self).__init__()
         self.train_model = train_data
         if train_data:
