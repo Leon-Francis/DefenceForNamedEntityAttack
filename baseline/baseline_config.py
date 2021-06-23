@@ -8,7 +8,7 @@ class Baseline_Config():
     cuda_idx = 0
     train_device = torch.device('cuda:' + str(cuda_idx))
     batch_size = 64
-    dataset = 'IMDB'
+    dataset = 'AGNEWS'
     baseline = 'TextCNN'
     epoch = 100
     save_acc_limit = 0.80
@@ -18,9 +18,9 @@ class Baseline_Config():
     if_mask_NE = False
     if_replace_NE = False
     if_attach_NE = False
-    if_adversial_training = True
+    if_adversial_training = False
 
-    linear_layer_num = 2
+    linear_layer_num = 1
     dropout_rate = 0.5
     is_fine_tuning = True
 
